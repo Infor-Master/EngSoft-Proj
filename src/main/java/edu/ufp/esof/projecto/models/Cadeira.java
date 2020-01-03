@@ -23,6 +23,8 @@ public class Cadeira {
     private Long id;
 
     private String designation;
+
+    @Column(unique = true)
     private String code;
 
     @OneToMany(cascade = CascadeType.PERSIST)

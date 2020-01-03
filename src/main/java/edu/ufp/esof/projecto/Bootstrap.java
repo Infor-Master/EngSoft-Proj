@@ -1,6 +1,7 @@
 package edu.ufp.esof.projecto;
 
 import edu.ufp.esof.projecto.models.Aluno;
+import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,18 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         Aluno aluno1 = new Aluno("João", "37190");
         Aluno aluno2 = new Aluno("Luísa", "37151");
         Aluno aluno3 = new Aluno("Rodrigo", "36824");
-        Aluno aluno4 = new Aluno("Quim Zé", "36824");
+        Aluno aluno4 = new Aluno("Inês", "36502");
+
+        Cadeira cadeira1 = new Cadeira("Engenharia de Software", "1");
+        Cadeira cadeira2 = new Cadeira("Redes de Computadores I", "2");
+        Cadeira cadeira3 = new Cadeira("Base de Dados", "3");
+        Cadeira cadeira4 = new Cadeira("Laboratório de Programação", "4");
+
+        cadeiraRepo.save(cadeira1);
+        cadeiraRepo.save(cadeira2);
+        cadeiraRepo.save(cadeira3);
+        cadeiraRepo.save(cadeira4);
+
 
         alunoRepo.save(aluno1);
         alunoRepo.save(aluno2);

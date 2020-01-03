@@ -60,7 +60,7 @@ public class AlunoController {
 
     @RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteAllAlunos(){
-        this.logger.info("Delete Request for every alunos");
+        this.logger.info("Delete Request for every aluno");
 
         alunoService.deleteAll();
         return ResponseEntity.ok("Deleted every aluno");

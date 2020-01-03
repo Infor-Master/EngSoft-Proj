@@ -40,7 +40,7 @@ public class AlunoService {
         return optionalAluno;
     }
 
-    public Optional<Aluno> createAluno(Aluno aluno) { // verificar se findByCode ou findByName
+    public Optional<Aluno> createAluno(Aluno aluno) {
         Optional<Aluno> optionalAluno=this.alunoRepo.findByCode(aluno.getCode());
         if(optionalAluno.isPresent()){
             return Optional.empty();

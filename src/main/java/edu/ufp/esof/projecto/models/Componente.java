@@ -1,7 +1,9 @@
 package edu.ufp.esof.projecto.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -13,6 +15,9 @@ import java.util.Set;
 
 @Data
 @Entity
+@JsonIdentityInfo(
+        generator= ObjectIdGenerators.PropertyGenerator.class,
+        property="id")
 @NoArgsConstructor
 public class Componente {
 
@@ -25,26 +30,76 @@ public class Componente {
     @ManyToOne
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @JsonBackReference
-    private Docente docente;
+    //@JsonBackReference
+    private Docente docente = null;
+
 
     @ManyToMany
-    @JsonBackReference
+    //@JsonBackReference(value = "alunos-componentes")
     private Set<Aluno> alunos=new HashSet<>();
 
     @ManyToOne
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @JsonBackReference
+    //@JsonBackReference
     private Oferta oferta;
 
     @OneToMany(mappedBy = "componente",cascade = CascadeType.PERSIST)
-    @JsonManagedReference
+    //@JsonManagedReference
     private Set<Momento> momentos=new HashSet<>();
 
-
-    public Componente(String type) {
-        this.setType(type);
+    public Componente(String type, Oferta oferta) {
+        this.type = type;
+        this.oferta = oferta;
     }
 
+    /**
+     * Editar o tipo de componente
+     * @param type tipo de Componente
+     */
+    public void changeType(String type){
+        setType(type);
+    }
+
+    /**
+     * Adiciona docente à cadeira
+     * @param d Docente a adicionar
+     */
+    public void addDocente(Docente d){
+        if (docente == null){
+            docente = d;
+            d.getComponentes().add(this);
+        }
+    }
+
+    /**
+     * Remove docente da cadeira
+     * @return Docente removido
+     */
+    public Docente removeDocente(){
+        Docente d = docente;
+        if (docente != null){
+            //docente.removeComponente(this);
+            docente = null;
+        }
+        return d;
+    }
+
+    public void addAluno(Aluno a){
+        if(!alunos.contains(a)){
+            alunos.add(a);
+            //a.addComponente(a);
+        }
+    }
+
+    public Aluno removeAluno(long id){
+        for (Aluno a : alunos) {
+            if (a.getId().equals(id)){
+                a.getComponentes().remove(this);
+                alunos.remove(a);
+                return a;
+            }
+        }
+        return null;
+    }
 }

@@ -1,7 +1,9 @@
 package edu.ufp.esof.projecto.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,9 @@ import javax.persistence.*;
 
 @Data
 @Entity
+@JsonIdentityInfo(
+        generator= ObjectIdGenerators.PropertyGenerator.class,
+        property="id")
 @NoArgsConstructor
 public class QuestaoRespondida {
     @Id
@@ -21,15 +26,15 @@ public class QuestaoRespondida {
     @ManyToOne
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @JsonBackReference
+    //@JsonBackReference
     private MomentoRealizado momento;
 
     @OneToOne
-    @JsonManagedReference
+    //@JsonManagedReference
     private Criterio criterio;
 
     @OneToOne
-    @JsonManagedReference
+    //@JsonManagedReference
     private Questao questao;
 
     public QuestaoRespondida(Questao questao){

@@ -1,7 +1,9 @@
 package edu.ufp.esof.projecto.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -13,6 +15,9 @@ import java.util.Set;
 
 @Data
 @Entity
+@JsonIdentityInfo(
+        generator= ObjectIdGenerators.PropertyGenerator.class,
+        property="id")
 @NoArgsConstructor
 public class Momento {
 
@@ -26,11 +31,11 @@ public class Momento {
     @ManyToOne
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @JsonBackReference
+    //@JsonBackReference
     private Componente componente;
 
     @OneToMany(mappedBy = "momento", cascade = CascadeType.PERSIST)
-    @JsonManagedReference
+    //@JsonManagedReference
     private Set<Questao> questoes=new HashSet<>();
 
     public Momento(String designation){

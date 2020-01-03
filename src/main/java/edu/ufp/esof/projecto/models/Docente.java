@@ -1,6 +1,8 @@
 package edu.ufp.esof.projecto.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +12,9 @@ import java.util.Set;
 
 @Data
 @Entity
+@JsonIdentityInfo(
+        generator= ObjectIdGenerators.PropertyGenerator.class,
+        property="id")
 @NoArgsConstructor
 public class Docente {
 
@@ -21,11 +26,8 @@ public class Docente {
     private String code;
 
     @OneToMany(mappedBy = "docente",cascade = CascadeType.PERSIST)
-    @JsonManagedReference
+    //@JsonManagedReference
     private Set<Componente> componentes=new HashSet<>();
-
-
-
 
 
     public Docente(String name, String code) {

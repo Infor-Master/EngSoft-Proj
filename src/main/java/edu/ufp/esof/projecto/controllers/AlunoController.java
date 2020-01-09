@@ -72,7 +72,7 @@ public class AlunoController {
 
         Boolean deleted = this.alunoService.deleteAluno(id);
         if(deleted) {
-            return ResponseEntity.ok("Delete aluno with id = " + id);//new ResponseEntity<>("Delete aluno with id = " + id, HttpStatus.OK);
+            return ResponseEntity.ok("Delete aluno with id = " + id);
         }
         throw new NoAlunoExcpetion(id);
     }

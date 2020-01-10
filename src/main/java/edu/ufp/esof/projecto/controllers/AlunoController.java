@@ -45,7 +45,7 @@ public class AlunoController {
     }
 
     //@PutMapping(value = "{id}")
-    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     //@PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     //@PutMapping(value = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Aluno>editAluno(@PathVariable("id") String id, @RequestBody Aluno aluno) throws NoAlunoExcpetion{

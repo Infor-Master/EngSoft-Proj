@@ -75,7 +75,7 @@ public class CadeiraController {
     }
 
 
-    @RequestMapping(value = "{nome}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{nome}", method = RequestMethod.PUT)
     public ResponseEntity<Cadeira>editCadeira(@PathVariable("nome") String nome, @RequestBody Cadeira cadeira) throws NoNamedCadeiraException{
         this.logger.info("Update Request for aluno named " + nome);
 

@@ -92,7 +92,7 @@ public class ResultadoAprendizagemController {
         }
     }
 
-    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Resultado Apendizagem já existente")
+    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Resultado Aprendizagem já existente")
     private static class ResultadoAprendizagemAlreadyExistsExcpetion extends RuntimeException {
 
         public ResultadoAprendizagemAlreadyExistsExcpetion(String designation) {

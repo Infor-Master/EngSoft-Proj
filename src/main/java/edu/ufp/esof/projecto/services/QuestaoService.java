@@ -1,7 +1,9 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Questao;
+import edu.ufp.esof.projecto.models.QuestaoRespondida;
 import edu.ufp.esof.projecto.repositories.QuestaoRepo;
+import edu.ufp.esof.projecto.repositories.QuestaoRespondidaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +15,12 @@ import java.util.Set;
 public class QuestaoService {
 
     private QuestaoRepo questaoRepo;
+    private QuestaoRespondidaRepo questaoRespondidaRepo;
 
     @Autowired
-    public QuestaoService(QuestaoRepo questaoRepo) {
+    public QuestaoService(QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo) {
         this.questaoRepo = questaoRepo;
+        this.questaoRespondidaRepo = questaoRespondidaRepo;
     }
 
     public Set<Questao> findAll(){
@@ -37,6 +41,17 @@ public class QuestaoService {
         }
         return optionalQuestao;
     }
+
+    public Set<QuestaoRespondida> findAllByQuestao(Questao questao){
+        Set<QuestaoRespondida> questoesRespondidas=new HashSet<>();
+        for (QuestaoRespondida qr:this.questaoRespondidaRepo.findAll()) {
+            if(qr.getQuestao().getId().compareTo(questao.getId())==0){
+                questoesRespondidas.add(qr);
+            }
+        }
+        return questoesRespondidas;
+    }
+
 
     public Optional<Questao> createQuestao(Questao questao){
         Optional<Questao> optionalQuestao=this.questaoRepo.findByDesignation(questao.getDesignation());
@@ -60,6 +75,9 @@ public class QuestaoService {
     public Boolean deleteQuestao(String designation){
         Optional<Questao> optionalQuestao=this.questaoRepo.findByDesignation(designation);
         if(optionalQuestao.isPresent()){
+            for (QuestaoRespondida qr:this.findAllByQuestao(optionalQuestao.get())) {
+                questaoRespondidaRepo.delete(qr);
+            }
             questaoRepo.delete(optionalQuestao.get());
             return true;
         }
@@ -67,6 +85,11 @@ public class QuestaoService {
     }
 
     public void deleteAll(){
+        for (Questao q:this.questaoRepo.findAll()) {
+            for (QuestaoRespondida qr:this.findAllByQuestao(q)) {
+                questaoRespondidaRepo.delete(qr);
+            }
+        }
         questaoRepo.deleteAll();
     }
 }

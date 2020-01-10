@@ -1,6 +1,9 @@
 package edu.ufp.esof.projecto.services;
 
+import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Componente;
+import edu.ufp.esof.projecto.models.Oferta;
+import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.ComponenteRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,61 +16,109 @@ import java.util.Set;
 public class ComponenteService {
 
     private ComponenteRepo componenteRepo;
+    private CadeiraRepo cadeiraRepo;
+    private CadeiraService cadeiraService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public ComponenteService(ComponenteRepo componenteRepo) {
+    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo) {
         this.componenteRepo = componenteRepo;
+        this.cadeiraRepo = cadeiraRepo;
     }
 
-    public Set<Componente> findAll() {
-        Set<Componente> componentes=new HashSet<>();
-        for(Componente c:this.componenteRepo.findAll()){
-            componentes.add(c);
+    public Set<Componente> findAll(String cadeira, int ano) {
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
+        Set<Componente> componentes =new HashSet<>();
+        if (optionalCadeira.isPresent()){
+            for (Oferta o : optionalCadeira.get().getOfertas()) {
+                if (o.getAno() == ano){
+                    for (Componente comp : o.getComponentes()) {
+                        componentes.add(comp);
+                    }
+                    return componentes;
+                }
+            }
         }
         return componentes;
     }
 
-    public Optional<Componente> findByType(String type) {
+    public Optional<Componente> findByType(String cadeira, int ano, String type) {
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         Optional<Componente> optionalComponente = Optional.empty();
-        for(Componente c:this.componenteRepo.findAll()){
-            if (c.getType().compareTo(type) == 0){
-                optionalComponente = Optional.of(c);
-                break;
+        if (optionalCadeira.isPresent()){
+            for (Oferta o : optionalCadeira.get().getOfertas()) {
+                if (o.getAno() == ano){
+                    for (Componente c : o.getComponentes()) {
+                        if (c.getType().compareTo(type) == 0){
+                            optionalComponente = Optional.of(c);
+                            return optionalComponente;
+                        }
+                    }
+                }
             }
         }
         return optionalComponente;
     }
 
-    public Optional<Componente> createComponente(Componente componente) {
-        Optional<Componente> optionalComponente=this.componenteRepo.findByType(componente.getType());
+    public Optional<Componente> createComponente(String cadeira, int ano, Componente componente) {
+        Optional<Componente> optionalComponente= findByType(cadeira,ano,componente.getType());
         if(optionalComponente.isPresent()){
             return Optional.empty();
         }
-        Componente createdComponente=this.componenteRepo.save(componente);
-        return Optional.of(createdComponente);
-    }
-
-    public Optional<Componente> updateComponente(String type, Componente componente){
-        Optional<Componente> optionalComponente=this.componenteRepo.findById(componente.getId());
-        if(optionalComponente.isPresent()){
-            componenteRepo.save(componente);
-            return optionalComponente;
+        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        if (optionalCadeira.isPresent()){
+            for (Oferta o : optionalCadeira.get().getOfertas()) {
+                if (o.getAno()==ano){
+                    o.getComponentes().add(componente);
+                    componente.setOferta(o);
+                    Componente createdComponente=this.componenteRepo.save(componente);
+                    return Optional.of(createdComponente);
+                }
+            }
         }
         return Optional.empty();
     }
 
-    public Boolean deleteComponente(String type){
-        Optional<Componente> optionalComponente=this.componenteRepo.findByType(type);
+    //tem um bug, adiciona um novo objeto a base de dados em vez de o substituir
+    public Optional<Componente> updateComponente(String cadeira, int ano, String type, Componente componente){
+        Optional<Componente> optionalComponente = findByType(cadeira,ano,type);
         if(optionalComponente.isPresent()){
+            componenteRepo.save(componente);
+
+        }
+        return optionalComponente;
+    }
+
+
+    public Boolean deleteComponente(String cadeira, int ano, String type){
+        Optional<Componente> optionalComponente = findByType(cadeira,ano,type);
+        //Optional<Componente> optionalComponente=this.componenteRepo.findByType(type);
+        if(optionalComponente.isPresent()){
+            for (Componente c : optionalComponente.get().getOferta().getComponentes()) {
+               if (c.getType().compareTo(type) == 0){
+                   optionalComponente.get().getOferta().getComponentes().remove(c);
+                   break;
+               }
+            }
+            optionalComponente.get().setOferta(null);
             componenteRepo.delete(optionalComponente.get());
             return true;
         }
         return false;
     }
 
-    // está mal, tem de ser específico a disciplina
-    public void deleteAll(){
-        componenteRepo.deleteAll();
+    public void deleteAll(String cadeira, int ano){
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
+        if (optionalCadeira.isPresent()){
+            for (Oferta o : optionalCadeira.get().getOfertas()) {
+                if (o.getAno() == ano){
+                    for (Componente c : o.getComponentes()) {
+                        o.setComponentes(new HashSet<>());
+                        c.setOferta(null);
+                        componenteRepo.deleteById(c.getId());
+                    }
+                }
+            }
+        }
     }
 }

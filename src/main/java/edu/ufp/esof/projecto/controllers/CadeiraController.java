@@ -1,7 +1,9 @@
 package edu.ufp.esof.projecto.controllers;
 
 import edu.ufp.esof.projecto.models.Cadeira;
+import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.services.CadeiraService;
+import edu.ufp.esof.projecto.services.ComponenteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +22,12 @@ public class CadeiraController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private CadeiraService cadeiraService;
+    private ComponenteService componenteService;
 
     @Autowired
-    public CadeiraController(CadeiraService cadeiraService) {
+    public CadeiraController(CadeiraService cadeiraService, ComponenteService componenteService) {
         this.cadeiraService = cadeiraService;
+        this.componenteService = componenteService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -32,17 +36,6 @@ public class CadeiraController {
 
         return ResponseEntity.ok(this.cadeiraService.findAll());
     }
-
-    /*@RequestMapping(value = "/{id}",method = RequestMethod.GET)
-    public ResponseEntity<Cadeira> getCadeiraById(@PathVariable("id") String id) throws NoCadeiraException {
-        this.logger.info("Listing Request for cadeira with id " + id);
-
-        Optional<Cadeira> optionalCadeira =this.cadeiraService.findByNumber(id);
-        if(optionalCadeira.isPresent()) {
-            return ResponseEntity.ok(optionalCadeira.get());
-        }
-        throw new NoCadeiraException(id);
-    }*/
 
     @RequestMapping(value = "/{nome}",method = RequestMethod.GET)
     public ResponseEntity<Cadeira> getCadeiraByName(@PathVariable("nome") String nome) throws NoCadeiraException {
@@ -101,6 +94,89 @@ public class CadeiraController {
 
 
 
+    //-------------------------------------------//
+    //             COMPONENTE RELATED            //
+    //-------------------------------------------//
+
+
+
+
+    @RequestMapping(value = "/{cadeira}/{ano}/componentes", method = RequestMethod.GET)
+    public ResponseEntity<Iterable<Componente>> getAllComponentes(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano){
+        this.logger.info("Listing Request for " + cadeira + "'s Componentes in " + ano);
+
+        return ResponseEntity.ok(this.componenteService.findAll(cadeira, ano));
+    }
+
+
+    @RequestMapping(value = "/{cadeira}/{ano}/{type}",method = RequestMethod.GET)
+    public ResponseEntity<Componente> getComponente(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("type") String type) throws NoComponenteException {
+        this.logger.info("Listing Request for component " + type + " of " + cadeira + " in " + ano);
+
+        Optional<Componente> optionalComponente =this.componenteService.findByType(cadeira, ano, type);
+        if(optionalComponente.isPresent()) {
+            return ResponseEntity.ok(optionalComponente.get());
+        }
+        throw new NoComponenteException(type);
+    }
+
+    @RequestMapping(value = "/{cadeira}/{ano}/{type}", method = RequestMethod.PUT)
+    public ResponseEntity<Componente>editComponente(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("type") String type, @RequestBody Componente componente) throws NoComponenteException{
+        this.logger.info("Update Request for component " + type + " of " + cadeira + " in " + ano);
+
+        Optional<Componente> optionalComponente =this.componenteService.updateComponente(cadeira,ano,type, componente);
+        if(optionalComponente.isPresent()) {
+            return ResponseEntity.ok(optionalComponente.get());
+        }
+        throw new NoComponenteException(type);
+    }
+
+    @RequestMapping(value = "/{cadeira}/{ano}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteAllComponentes(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano){
+        this.logger.info("Delete Request for every componente of " + cadeira + " in " + ano);
+
+        componenteService.deleteAll(cadeira, ano);
+        return ResponseEntity.ok("Deleted every componente");
+    }
+
+    @RequestMapping(value = "/{cadeira}/{ano}/{type}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteComponente(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("type") String type) throws NoComponenteException{
+        this.logger.info("Delete Request for componente " + type + " of " + cadeira +" in " + ano);
+
+        Boolean deleted = this.componenteService.deleteComponente(cadeira,ano,type);
+        if(deleted) {
+            return ResponseEntity.ok("Delete componente " + type);
+        }
+        throw new NoComponenteException(type);
+    }
+
+
+    //verificar
+    @PostMapping(value = "/{cadeira}/{ano}", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Componente> createComponente(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @RequestBody Componente componente){
+        this.logger.info("Create Componente Request");
+
+        Optional<Componente> componenteOptional=this.componenteService.createComponente(cadeira,ano,componente);
+        if(componenteOptional.isPresent()){
+            return ResponseEntity.ok(componenteOptional.get());
+        }
+        throw new ComponenteAlreadyExistsExcpetion(componente.getType());
+    }
+
+
+
+
+
+
+
+
+    //-------------------------------------------//
+    //                 EXCEPTIONS                //
+    //-------------------------------------------//
+
+
+
+
     @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Cadeira não existente")
     private static class NoCadeiraException extends RuntimeException {
 
@@ -122,6 +198,22 @@ public class CadeiraController {
 
         public CadeiraAlreadyExistsExcpetion(String name) {
             super("Cadeira com nome: " + name + " já existe");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Componente não existente")
+    private static class NoComponenteException extends RuntimeException {
+
+        private NoComponenteException(String type) {
+            super("Componente " + type + " nao existente");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Componente já existente")
+    private static class ComponenteAlreadyExistsExcpetion extends RuntimeException {
+
+        public ComponenteAlreadyExistsExcpetion(String type) {
+            super("Componente " + type + " já existe");
         }
     }
 }

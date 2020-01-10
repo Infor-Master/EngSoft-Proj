@@ -51,6 +51,7 @@ public class Componente {
     public Componente(String type, Oferta oferta) {
         this.type = type;
         this.oferta = oferta;
+        oferta.getComponentes().add(this);
     }
 
     /**

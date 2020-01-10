@@ -2,6 +2,8 @@ package edu.ufp.esof.projecto;
 
 import edu.ufp.esof.projecto.models.Aluno;
 import edu.ufp.esof.projecto.models.Cadeira;
+import edu.ufp.esof.projecto.models.Componente;
+import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +69,6 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         Cadeira cadeira3 = new Cadeira("Base de Dados", "3");
         Cadeira cadeira4 = new Cadeira("Laboratório de Programação", "4");
 
-        cadeiraRepo.save(cadeira1);
         cadeiraRepo.save(cadeira2);
         cadeiraRepo.save(cadeira3);
         cadeiraRepo.save(cadeira4);
@@ -85,5 +86,13 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         */
         aluno1.setCode("18");
         alunoRepo.save(aluno1);
+
+        Oferta oferta1 = new Oferta(2020,cadeira1);
+        Oferta oferta2 = new Oferta(2019,cadeira1);
+        Componente componente1 = new Componente("pratica", oferta1);
+        //ofertaRepo.save(oferta1);
+        //componenteRepo.save(componente1);
+        cadeiraRepo.save(cadeira1);
+
     }
 }

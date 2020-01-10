@@ -26,14 +26,14 @@ public class ComponenteController {
         this.componenteService = componenteService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    /*@RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Iterable<Componente>> getAllComponentes(){
         this.logger.info("Listing Request for Componentes");
 
         return ResponseEntity.ok(this.componenteService.findAll());
-    }
+    }*/
 
-    @RequestMapping(value = "/{type}",method = RequestMethod.GET)
+    /*@RequestMapping(value = "/{type}",method = RequestMethod.GET)
     public ResponseEntity<Componente> getComponente(@PathVariable("type") String type) throws NoComponenteException {
         this.logger.info("Listing Request for component with type = " + type);
 
@@ -42,9 +42,9 @@ public class ComponenteController {
             return ResponseEntity.ok(optionalComponente.get());
         }
         throw new NoComponenteException(type);
-    }
+    }*/
 
-    @RequestMapping(value = "/{type}", method = RequestMethod.PUT)
+    /*@RequestMapping(value = "/{type}", method = RequestMethod.PUT)
     public ResponseEntity<Componente>editComponente(@PathVariable("type") String type, @RequestBody Componente componente) throws NoComponenteException{
         this.logger.info("Update Request for componente " + type);
 
@@ -53,17 +53,17 @@ public class ComponenteController {
             return ResponseEntity.ok(optionalComponente.get());
         }
         throw new NoComponenteException(type);
-    }
+    }*/
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    /*@RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteAllComponentes(){
         this.logger.info("Delete Request for every componente");
 
         componenteService.deleteAll();
         return ResponseEntity.ok("Deleted every componente");
-    }
+    }*/
 
-    @RequestMapping(value = "/{type}", method = RequestMethod.DELETE)
+    /*@RequestMapping(value = "/{type}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteComponente(@PathVariable("type") String type) throws NoComponenteException{
         this.logger.info("Delete Request for componente " + type);
 
@@ -72,9 +72,9 @@ public class ComponenteController {
             return ResponseEntity.ok("Delete componente " + type);
         }
         throw new NoComponenteException(type);
-    }
+    }*/
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    /*@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Componente> createComponente(@RequestBody Componente componente){
         this.logger.info("Create Componente Request");
 
@@ -83,7 +83,7 @@ public class ComponenteController {
             return ResponseEntity.ok(componenteOptional.get());
         }
         throw new ComponenteAlreadyExistsExcpetion(componente.getType());
-    }
+    }*/
 
     @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Componente não existente")
     private static class NoComponenteException extends RuntimeException {

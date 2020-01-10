@@ -34,16 +34,19 @@ public class Oferta {
     //@JsonBackReference
     private Cadeira cadeira;
 
-    @OneToMany(mappedBy = "oferta",cascade = CascadeType.PERSIST)
+    //@OneToMany(mappedBy = "oferta",cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST)
     //@JsonManagedReference
     private Set<Componente> componentes=new HashSet<>();
 
-    @OneToMany(mappedBy = "oferta",cascade = CascadeType.PERSIST)
+    //@OneToMany(mappedBy = "oferta",cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST)
     //@JsonManagedReference
     private Set<ResultadoAprendizagem> ras=new HashSet<>();
 
     public Oferta(Integer ano, Cadeira cadeira) {
         this.ano = ano;
         this.cadeira = cadeira;
+        cadeira.getOfertas().add(this);
     }
 }

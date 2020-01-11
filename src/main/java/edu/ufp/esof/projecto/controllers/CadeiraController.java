@@ -193,6 +193,46 @@ public class CadeiraController {
         throw new NoCriterioExcpetion(designation);
     }
 
+    @RequestMapping(value = "/{cadeira}/criterios/{designation}", method = RequestMethod.PUT)
+    public ResponseEntity<Criterio>editCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation, @RequestBody Criterio criterio) throws NoCriterioExcpetion{
+        this.logger.info("Update Request for criterio " + designation + " of " + cadeira);
+
+        Optional<Criterio> optionalCriterio =this.criterioService.updateCriterio(cadeira, designation, criterio);
+        if(optionalCriterio.isPresent()) {
+            return ResponseEntity.ok(optionalCriterio.get());
+        }
+        throw new NoCriterioExcpetion(designation);
+    }
+
+    @RequestMapping(value = "/{cadeira}/criterios/", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteAllCriterios(@PathVariable("cadeira") String cadeira){
+        this.logger.info("Delete Request for every criterio of " + cadeira);
+
+        criterioService.deleteAll(cadeira);
+        return ResponseEntity.ok("Deleted every criterio from " + cadeira);
+    }
+
+    @RequestMapping(value = "/{cadeira}/criterios/{designation}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation) throws NoCriterioExcpetion{
+        this.logger.info("Delete Request for criterio " + designation + " from " + cadeira);
+
+        Boolean deleted = this.criterioService.deleteCriterio(cadeira, designation);
+        if(deleted) {
+            return ResponseEntity.ok("Delete criterio " + designation);
+        }
+        throw new NoCriterioExcpetion(designation);
+    }
+
+    @PostMapping(value = "/{cadeira}/criterios", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Criterio> createCriterio(@PathVariable("cadeira") String cadeira, @RequestBody Criterio criterio){
+        this.logger.info("Create Criterio Request for " + cadeira);
+
+        Optional<Criterio> criterioOptional=this.criterioService.createCriterio(cadeira, criterio);
+        if(criterioOptional.isPresent()){
+            return ResponseEntity.ok(criterioOptional.get());
+        }
+        throw new CriterioAlreadyExistsExcpetion(criterio.getDesignation());
+    }
 
 
 

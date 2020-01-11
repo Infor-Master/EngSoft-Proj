@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -45,34 +46,58 @@ public class CriterioService {
         return Optional.empty();
     }
 
-    public Optional<Criterio> createCriterio(Criterio criterio) {
-        Optional<Criterio> optionalCriterio=this.criterioRepo.findByDesignation(criterio.getDesignation());
-        if(optionalCriterio.isPresent()){
-            return Optional.empty();
-        }
-        Criterio createdCriterio=this.criterioRepo.save(criterio);
-        return Optional.of(createdCriterio);
-    }
-
-    public Optional<Criterio> updateCriterio(String designation, Criterio criterio){
-        Optional<Criterio> optionalCriterio=this.criterioRepo.findByDesignation(designation);
-        if(optionalCriterio.isPresent()){
-            criterioRepo.save(criterio);
-            return optionalCriterio;
+    public Optional<Criterio> createCriterio(String cadeira, Criterio criterio) {
+        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        if (optionalCadeira.isPresent()){
+            for (Criterio c : optionalCadeira.get().getCriterios()) {
+                if (c.getDesignation().compareTo(criterio.getDesignation())==0){
+                    return Optional.empty();
+                }
+            }
+            optionalCadeira.get().getCriterios().add(criterio);
+            this.criterioRepo.save(criterio);
+            return Optional.of(criterio);
         }
         return Optional.empty();
     }
 
-    public Boolean deleteCriterio(String designation){
-        Optional<Criterio> optionalCriterio=this.criterioRepo.findByDesignation(designation);
-        if(optionalCriterio.isPresent()){
-            criterioRepo.delete(optionalCriterio.get());
-            return true;
+    public Optional<Criterio> updateCriterio(String cadeira, String designation, Criterio criterio){
+        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        if (optionalCadeira.isPresent()){
+            for (Criterio c : optionalCadeira.get().getCriterios()) {
+                if (c.getDesignation().compareTo(designation)==0){
+                    c=criterio;
+                    criterioRepo.save(criterio);
+                    return Optional.of(criterio);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Boolean deleteCriterio(String cadeira, String designation){
+        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        if (optionalCadeira.isPresent()){
+            for (Criterio c : optionalCadeira.get().getCriterios()) {
+                if (c.getDesignation().compareTo(designation) == 0){
+                    optionalCadeira.get().getCriterios().remove(c);
+                    criterioRepo.delete(c);
+                    return true;
+                }
+            }
         }
         return false;
     }
 
-    public void deleteAll(){
-        criterioRepo.deleteAll();
+    public void deleteAll(String cadeira){
+        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        if(optionalCadeira.isPresent()){
+            while(!optionalCadeira.get().getCriterios().isEmpty()){
+                Iterator<Criterio> criterios = optionalCadeira.get().getCriterios().iterator();
+                Criterio c=criterios.next();
+                optionalCadeira.get().getCriterios().remove(c);
+                criterioRepo.delete(c);
+            }
+        }
     }
 }

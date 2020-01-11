@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -24,6 +25,11 @@ public class ComponenteController {
     @Autowired
     public ComponenteController(ComponenteService componenteService) {
         this.componenteService = componenteService;
+    }
+
+    @GetMapping(value="/search",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Iterable<Componente>> searchComponentes(@RequestParam Map<String,String> query){
+        return ResponseEntity.ok(this.componenteService.filterComponente(query));
     }
 
     /*@RequestMapping(method = RequestMethod.GET)

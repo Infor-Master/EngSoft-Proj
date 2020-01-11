@@ -26,14 +26,14 @@ public class CriterioController {
         this.criterioService = criterioService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    /*@RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Iterable<Criterio>> getAllCriterios(){
         this.logger.info("Listing Request for criterios");
 
         return ResponseEntity.ok(this.criterioService.findAll());
-    }
+    }*/
 
-    @RequestMapping(value = "/{designation}",method = RequestMethod.GET)
+    /*@RequestMapping(value = "/{designation}",method = RequestMethod.GET)
     public ResponseEntity<Criterio> getCriterio(@PathVariable("designation") String designation) throws NoCriterioExcpetion {
         this.logger.info("Listing Request for criterio " + designation);
 
@@ -42,7 +42,7 @@ public class CriterioController {
             return ResponseEntity.ok(optionalCriterio.get());
         }
         throw new NoCriterioExcpetion(designation);
-    }
+    }*/
 
     @RequestMapping(value = "/{designation}", method = RequestMethod.PUT)
     public ResponseEntity<Criterio>editCriterio(@PathVariable("designation") String designation, @RequestBody Criterio criterio) throws NoCriterioExcpetion{

@@ -21,9 +21,10 @@ public class ComponenteService {
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo) {
+    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, CadeiraService cadeiraService) {
         this.componenteRepo = componenteRepo;
         this.cadeiraRepo = cadeiraRepo;
+        this.cadeiraService = cadeiraService;
     }
 
     public Set<Componente> findAll(String cadeira, int ano) {

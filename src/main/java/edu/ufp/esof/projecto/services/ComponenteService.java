@@ -5,10 +5,13 @@ import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.ComponenteRepo;
+import edu.ufp.esof.projecto.services.filters.Componente.FilterComponenteObject;
+import edu.ufp.esof.projecto.services.filters.Componente.FilterComponenteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,13 +21,28 @@ public class ComponenteService {
     private ComponenteRepo componenteRepo;
     private CadeiraRepo cadeiraRepo;
     private CadeiraService cadeiraService;
-    // Falta o Filtro do serviço e no constructor
+    private FilterComponenteService filterService;
 
     @Autowired
-    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, CadeiraService cadeiraService) {
+    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, CadeiraService cadeiraService, FilterComponenteService filterService) {
         this.componenteRepo = componenteRepo;
         this.cadeiraRepo = cadeiraRepo;
         this.cadeiraService = cadeiraService;
+        this.filterService = filterService;
+    }
+
+    public Set<Componente> filterComponente(Map<String, String> searchParams){
+        FilterComponenteObject filterComponenteObject= new FilterComponenteObject(searchParams);
+        Set<Componente> componentes=this.findAll();
+        return this.filterService.filter(componentes, filterComponenteObject);
+    }
+
+    public Set<Componente> findAll() {
+        Set<Componente> componentes=new HashSet<>();
+        for (Componente c:this.componenteRepo.findAll()) {
+            componentes.add(c);
+        }
+        return componentes;
     }
 
     public Set<Componente> findAll(String cadeira, int ano) {
@@ -33,9 +51,7 @@ public class ComponenteService {
         if (optionalCadeira.isPresent()){
             for (Oferta o : optionalCadeira.get().getOfertas()) {
                 if (o.getAno() == ano){
-                    for (Componente comp : o.getComponentes()) {
-                        componentes.add(comp);
-                    }
+                    componentes.addAll(o.getComponentes());
                     return componentes;
                 }
             }

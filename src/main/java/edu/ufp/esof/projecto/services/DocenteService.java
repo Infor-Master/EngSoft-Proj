@@ -2,11 +2,14 @@ package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Docente;
 import edu.ufp.esof.projecto.repositories.DocenteRepo;
+import edu.ufp.esof.projecto.services.filters.Docente.FilterDocenteObject;
+import edu.ufp.esof.projecto.services.filters.Docente.FilterDocenteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,14 +17,22 @@ import java.util.Set;
 public class DocenteService {
 
     private DocenteRepo docenteRepo;
+    private FilterDocenteService filterService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public DocenteService(DocenteRepo docenteRepo) {
+    public DocenteService(DocenteRepo docenteRepo, FilterDocenteService filterService) {
         this.docenteRepo = docenteRepo;
+        this.filterService = filterService;
     }
 
 
+    public Set<Docente> filterDocente(Map<String, String> searchParams){
+        FilterDocenteObject filterDocenteObject= new FilterDocenteObject(searchParams);
+        Set<Docente> docentes=this.findAll();
+        return this.filterService.filter(docentes, filterDocenteObject);
+    }
+    
     public Set<Docente> findAll() {
         Set<Docente> docentes=new HashSet<>();
         for(Docente d:this.docenteRepo.findAll()){

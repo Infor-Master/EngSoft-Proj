@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -26,6 +27,11 @@ public class DocenteController {
         this.docenteService = docenteService;
     }
 
+
+    @GetMapping(value="/search",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Iterable<Docente>> searchDocentes(@RequestParam Map<String,String> query){
+        return ResponseEntity.ok(this.docenteService.filterDocente(query));
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Iterable<Docente>> getAllDocentes(){

@@ -3,9 +3,11 @@ package edu.ufp.esof.projecto.controllers;
 import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.models.Criterio;
+import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.services.CadeiraService;
 import edu.ufp.esof.projecto.services.ComponenteService;
 import edu.ufp.esof.projecto.services.CriterioService;
+import edu.ufp.esof.projecto.services.OfertaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +29,14 @@ public class CadeiraController {
     private CadeiraService cadeiraService;
     private ComponenteService componenteService;
     private CriterioService criterioService;
+    private OfertaService ofertaService;
 
     @Autowired
-    public CadeiraController(CadeiraService cadeiraService, ComponenteService componenteService, CriterioService criterioService) {
+    public CadeiraController(CadeiraService cadeiraService, ComponenteService componenteService, CriterioService criterioService, OfertaService ofertaService) {
         this.cadeiraService = cadeiraService;
         this.componenteService = componenteService;
         this.criterioService = criterioService;
+        this.ofertaService = ofertaService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -141,7 +145,7 @@ public class CadeiraController {
         throw new NoComponenteException(type);
     }
 
-    @RequestMapping(value = "/{cadeira}/{ano}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{cadeira}/{ano}/componentes", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteAllComponentes(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano){
         this.logger.info("Delete Request for every componente of " + cadeira + " in " + ano);
 
@@ -244,6 +248,74 @@ public class CadeiraController {
 
 
     //-------------------------------------------//
+    //              OFERTA RELATED               //
+    //-------------------------------------------//
+
+
+
+
+    // Perguntar ao professor
+    @RequestMapping(value = "/{cadeira}/ofertas", method = RequestMethod.GET)
+    public ResponseEntity<Iterable<Oferta>> getAllOfertas(@PathVariable("cadeira") String cadeira){
+        this.logger.info("Listing Request for ofertas for " + cadeira);
+        return ResponseEntity.ok(this.ofertaService.findAll(cadeira));
+    }
+
+    @RequestMapping(value = "/{cadeira}/{ano}", method = RequestMethod.GET)
+    public ResponseEntity<Oferta> getOfertaById(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano) throws NoOfertaException{
+        this.logger.info("Listing Request for oferta " + ano + " from " + cadeira);
+        Optional<Oferta> optionalOferta=this.ofertaService.find(cadeira, ano);
+        if(optionalOferta.isPresent()){
+            return ResponseEntity.ok(optionalOferta.get());
+        }
+        throw new NoOfertaException(cadeira, ano);
+    }
+
+    @RequestMapping(value = "/{cadeira}/{ano}", method = RequestMethod.PUT)
+    public ResponseEntity<Oferta>editOferta(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @RequestBody Oferta oferta) throws NoOfertaException{
+        this.logger.info("Update Request for oferta " + ano + " from " + cadeira);
+
+        Optional<Oferta> optionalOferta=this.ofertaService.updateOferta(cadeira, ano, oferta);
+        if(optionalOferta.isPresent()){
+            return ResponseEntity.ok(optionalOferta.get());
+        }
+        throw new NoOfertaException(cadeira, ano);
+    }
+
+    @RequestMapping(value = "/{cadeira}/ofertas", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteAllOfertas(@PathVariable("cadeira") String cadeira){
+        this.logger.info("Delete Request for every oferta from " + cadeira);
+
+        ofertaService.deleteAll(cadeira);
+        return ResponseEntity.ok("Deleted every oferta from " + cadeira);
+    }
+
+    @RequestMapping(value = "/{cadeira}/{ano}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteOferta(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano) throws NoOfertaException{
+        this.logger.info("Delete Request for oferta " + ano + " from " + cadeira);
+
+        Boolean deleted = this.ofertaService.deleteOferta(cadeira, ano);
+        if(deleted){
+            return ResponseEntity.ok("Delete oferta " + ano + " from " + cadeira);
+        }
+        throw new NoOfertaException(cadeira, ano);
+    }
+
+    @PostMapping(value = "/{cadeira}/ofertas", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Oferta> createOferta(@PathVariable("cadeira") String cadeira, @RequestBody Oferta oferta){
+        this.logger.info("Create Oferta Request with ano = " + oferta.getAno() + " for cadeira " + cadeira);
+
+        Optional<Oferta> optionalOferta=this.ofertaService.createOferta(cadeira, oferta);
+        if(optionalOferta.isPresent()){
+            return ResponseEntity.ok(optionalOferta.get());
+        }
+        throw new OfertaAlreadyExistsException(oferta.getId());
+    }
+
+
+
+
+    //-------------------------------------------//
     //                 EXCEPTIONS                //
     //-------------------------------------------//
 
@@ -304,5 +376,15 @@ public class CadeiraController {
         public CriterioAlreadyExistsExcpetion(String designation) {
             super("Criterio " + designation + " já existe");
         }
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Oferta não existente")
+    private static class NoOfertaException extends RuntimeException{
+        private NoOfertaException(String cadeira, int ano){super("Oferta de " + cadeira + " no ano " + ano + "nao existente");}
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Oferta já existente")
+    private static class OfertaAlreadyExistsException extends RuntimeException{
+        public OfertaAlreadyExistsException(Long id){super("Oferta com o id : " + id + " já existe");}
     }
 }

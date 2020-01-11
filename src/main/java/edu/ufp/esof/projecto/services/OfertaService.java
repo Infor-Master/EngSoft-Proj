@@ -1,7 +1,9 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Cadeira;
+import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.models.Oferta;
+import edu.ufp.esof.projecto.models.ResultadoAprendizagem;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.OfertaRepo;
 import edu.ufp.esof.projecto.services.filters.Cadeira.FilterCadeiraObject;
@@ -18,12 +20,14 @@ public class OfertaService {
     private OfertaRepo ofertaRepo;
     private CadeiraRepo cadeiraRepo;
     private FilterOfertaService filterService;
+    private ComponenteService componenteService;
 
     @Autowired
-    public OfertaService(OfertaRepo ofertaRepo, CadeiraRepo cadeiraRepo, FilterOfertaService filterService) {
+    public OfertaService(OfertaRepo ofertaRepo, CadeiraRepo cadeiraRepo, FilterOfertaService filterService, ComponenteService componenteService) {
         this.ofertaRepo = ofertaRepo;
         this.cadeiraRepo = cadeiraRepo;
         this.filterService = filterService;
+        this.componenteService = componenteService;
     }
 
     public Set<Oferta> filterOferta(Map<String, String> searchParams){
@@ -73,10 +77,14 @@ public class OfertaService {
 
     public Optional<Oferta> createOferta(String cadeira, Oferta oferta){
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
-        Optional<Oferta> optionalOferta=this.ofertaRepo.findById(oferta.getId());
-        if (optionalCadeira.isPresent() && optionalOferta.isEmpty()){
-            optionalOferta.get().setCadeira(optionalCadeira.get());
-            optionalCadeira.get().getOfertas().add(optionalOferta.get());
+        if (optionalCadeira.isPresent()){
+            for (Oferta o : optionalCadeira.get().getOfertas()) {
+                if (o.getAno() == oferta.getAno()){
+                    return Optional.empty();
+                }
+            }
+            oferta.setCadeira(optionalCadeira.get());
+            optionalCadeira.get().getOfertas().add(oferta);
             this.ofertaRepo.save(oferta);
             return Optional.of(oferta);
         }
@@ -88,9 +96,10 @@ public class OfertaService {
         if (optionalCadeira.isPresent()){
             for (Oferta o : optionalCadeira.get().getOfertas()) {
                 if (o.getAno() == ano){
-                    optionalCadeira.get().getOfertas().remove(o);
-                    o.setCadeira(null);
-                    ofertaRepo.delete(o);
+                    delete(o);
+                    //optionalCadeira.get().getOfertas().remove(o);
+                    //o.setCadeira(null);
+                    //ofertaRepo.delete(o);
                     return true;
                 }
             }
@@ -105,10 +114,23 @@ public class OfertaService {
             while(!optionalCadeira.get().getOfertas().isEmpty()){
                 Iterator<Oferta> ofertas = optionalCadeira.get().getOfertas().iterator();
                 Oferta o = ofertas.next();
-                optionalCadeira.get().getOfertas().remove(o);
-                o.setCadeira(null);
-                ofertaRepo.delete(o);
+                //optionalCadeira.get().getOfertas().remove(o);
+                //o.setCadeira(null);
+                //ofertaRepo.delete(o);
+                delete(o);
             }
         }
+    }
+
+    public void delete(Oferta o){
+        o.getCadeira().getOfertas().remove(o);
+        o.setCadeira(null);
+        for (Componente c : o.getComponentes()) {
+            componenteService.delete(c);
+        }
+        for (ResultadoAprendizagem ra : o.getRas()){
+            //delete ra
+        }
+        ofertaRepo.delete(o);
     }
 }

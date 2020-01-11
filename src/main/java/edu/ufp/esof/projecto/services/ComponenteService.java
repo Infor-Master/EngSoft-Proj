@@ -1,8 +1,6 @@
 package edu.ufp.esof.projecto.services;
 
-import edu.ufp.esof.projecto.models.Cadeira;
-import edu.ufp.esof.projecto.models.Componente;
-import edu.ufp.esof.projecto.models.Oferta;
+import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.ComponenteRepo;
 import edu.ufp.esof.projecto.services.filters.Componente.FilterComponenteObject;
@@ -109,17 +107,18 @@ public class ComponenteService {
 
     public Boolean deleteComponente(String cadeira, int ano, String type){
         Optional<Componente> optionalComponente = findByType(cadeira,ano,type);
-        //Optional<Componente> optionalComponente=this.componenteRepo.findByType(type);
         if(optionalComponente.isPresent()){
             for (Componente c : optionalComponente.get().getOferta().getComponentes()) {
                if (c.getType().compareTo(type) == 0){
-                   optionalComponente.get().getOferta().getComponentes().remove(c);
-                   break;
+                   delete(c);
+                   return true;
+                   //optionalComponente.get().getOferta().getComponentes().remove(c);
+                   //break;
                }
             }
-            optionalComponente.get().setOferta(null);
-            componenteRepo.delete(optionalComponente.get());
-            return true;
+           // optionalComponente.get().setOferta(null);
+            //componenteRepo.delete(optionalComponente.get());
+            //return true;
         }
         return false;
     }
@@ -130,12 +129,33 @@ public class ComponenteService {
             for (Oferta o : optionalCadeira.get().getOfertas()) {
                 if (o.getAno() == ano){
                     for (Componente c : o.getComponentes()) {
-                        o.setComponentes(new HashSet<>());
-                        c.setOferta(null);
-                        componenteRepo.deleteById(c.getId());
+                        delete(c);
+                        //o.setComponentes(new HashSet<>());
+                        //c.setOferta(null);
+                        //componenteRepo.deleteById(c.getId());
                     }
                 }
             }
         }
+    }
+
+    public void delete(Componente c){
+        if (c.getDocente() != null){
+            c.getDocente().getComponentes().remove(c);
+            c.setDocente(null);
+        }
+        for (Aluno a : c.getAlunos()) {
+            a.getComponentes().remove(c);
+        }
+        c.setAlunos(null);
+        for (Momento m : c.getMomentos()) {
+            //delete momento
+        }
+        c.setMomentos(null);
+        if (c.getOferta() != null){
+            c.getOferta().getComponentes().remove(c);
+            c.setOferta(null);
+        }
+        componenteRepo.delete(c);
     }
 }

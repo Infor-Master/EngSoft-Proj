@@ -2,6 +2,7 @@ package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Momento;
 import edu.ufp.esof.projecto.models.MomentoRealizado;
+import edu.ufp.esof.projecto.models.Questao;
 import edu.ufp.esof.projecto.repositories.MomentoRealizadoRepo;
 import edu.ufp.esof.projecto.repositories.MomentoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,13 @@ public class MomentoService {
 
     private MomentoRepo momentoRepo;
     private MomentoRealizadoRepo momentoRealizadoRepo;
+    private QuestaoService questaoService;
 
     @Autowired
-    public MomentoService(MomentoRepo momentoRepo, MomentoRealizadoRepo momentoRealizadoRepo) {
+    public MomentoService(MomentoRepo momentoRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoService questaoService) {
         this.momentoRepo = momentoRepo;
         this.momentoRealizadoRepo = momentoRealizadoRepo;
+        this.questaoService = questaoService;
     }
 
 
@@ -71,10 +74,20 @@ public class MomentoService {
         return Optional.empty();
     }
 
+
+    /**
+     * Apaga todas as questoes associadas a um momento (apagando as respondidas), seguido dos momentos realizados até se apagar a si
+     * @param designation designação do momento a apagar
+     * @return retorna falso se momento não existir
+     */
     public Boolean deleteMomento(String designation){
         Optional<Momento> optionalMomento = this.momentoRepo.findByDesignation(designation);
         if (optionalMomento.isPresent()){
-            for (MomentoRealizado mr:this.findAllByMomento(optionalMomento.get())) {
+            for (Questao q:optionalMomento.get().getQuestoes()) {
+                this.questaoService.deleteQuestao(q.getDesignation());
+            }
+
+            for (MomentoRealizado mr:this.findAllByMomento(optionalMomento.get())){
                 momentoRealizadoRepo.delete(mr);
             }
             momentoRepo.delete(optionalMomento.get());
@@ -85,10 +98,7 @@ public class MomentoService {
 
     public void deleteAll(){
         for (Momento m:this.momentoRepo.findAll()) {
-            for (MomentoRealizado mr:this.findAllByMomento(m)) {
-                momentoRealizadoRepo.delete(mr);
-            }
+            deleteMomento(m.getDesignation());
         }
-        momentoRepo.deleteAll();
     }
 }

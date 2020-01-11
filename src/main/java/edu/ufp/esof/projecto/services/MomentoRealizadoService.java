@@ -1,6 +1,8 @@
 package edu.ufp.esof.projecto.services;
 
+import edu.ufp.esof.projecto.models.Aluno;
 import edu.ufp.esof.projecto.models.MomentoRealizado;
+import edu.ufp.esof.projecto.models.QuestaoRespondida;
 import edu.ufp.esof.projecto.repositories.MomentoRealizadoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import java.util.Set;
 public class MomentoRealizadoService {
 
     private MomentoRealizadoRepo momentoRealizadoRepo;
+    private QuestaoRespondidaService questaoRespondidaService;
 
     public Set<MomentoRealizado> findAll(){
         Set<MomentoRealizado> MRs=new HashSet<>();
@@ -51,15 +54,18 @@ public class MomentoRealizadoService {
         return Optional.empty();
     }
 
+    /**
+     *  Boolean não usado ainda mas poderá ser necessário
+     */
     public Boolean deleteMomentoRealizado(Long id){
-        Optional<MomentoRealizado> optionalMR = this.momentoRealizadoRepo.findById(id);
-        if (optionalMR.isPresent()){
-            momentoRealizadoRepo.delete(optionalMR.get());
+        Optional<MomentoRealizado> optionalMomentoRealizado=this.momentoRealizadoRepo.findById(id);
+        if(optionalMomentoRealizado.isPresent()){
+            for (QuestaoRespondida qr:optionalMomentoRealizado.get().getQuestoes()) {
+                questaoRespondidaService.deleteQuestaoRespondida(qr.getId());
+            }
+            momentoRealizadoRepo.delete(optionalMomentoRealizado.get());
             return true;
         }
         return false;
     }
-
-    public void deleteAll(){
-        momentoRealizadoRepo.deleteAll();
-    }}
+}

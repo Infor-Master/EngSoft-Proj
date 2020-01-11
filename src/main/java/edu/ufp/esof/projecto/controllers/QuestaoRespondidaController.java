@@ -1,7 +1,6 @@
 package edu.ufp.esof.projecto.controllers;
 
 import edu.ufp.esof.projecto.models.QuestaoRespondida;
-import edu.ufp.esof.projecto.models.ResultadoAprendizagem;
 import edu.ufp.esof.projecto.services.QuestaoRespondidaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,24 +49,6 @@ public class QuestaoRespondidaController {
         Optional<QuestaoRespondida> optionalQuestaoRespondida=this.questaoRespondidaService.updateQuestaoRespondida(id, questaoRespondida);
         if(optionalQuestaoRespondida.isPresent()){
             return ResponseEntity.ok(optionalQuestaoRespondida.get());
-        }
-        throw new QuestaoRespondidaController.NoQuestaoRespondidaException(id);
-    }
-
-    @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteAllQuestaoRespondidas(){
-        this.logger.info("Delete Request for every questao Respondida");
-
-        questaoRespondidaService.deleteAll();
-        return ResponseEntity.ok("Deleted every questao Respondida");
-    }
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteQuestaoRespondida(@PathVariable("id") Long id) throws QuestaoRespondidaController.NoQuestaoRespondidaException {
-        this.logger.info("Delete Request for questao Respondida with id " + id);
-        Boolean deleted = this.questaoRespondidaService.deleteQuestaoRespondida(id);
-        if(deleted){
-            return ResponseEntity.ok("Delete questao Respondida with id = " + id);
         }
         throw new QuestaoRespondidaController.NoQuestaoRespondidaException(id);
     }

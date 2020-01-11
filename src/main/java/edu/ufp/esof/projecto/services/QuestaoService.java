@@ -2,8 +2,8 @@ package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Questao;
 import edu.ufp.esof.projecto.models.QuestaoRespondida;
-import edu.ufp.esof.projecto.repositories.QuestaoRepo;
 import edu.ufp.esof.projecto.repositories.QuestaoRespondidaRepo;
+import edu.ufp.esof.projecto.repositories.QuestaoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +72,11 @@ public class QuestaoService {
         return Optional.empty();
     }
 
+    /**
+     * Apaga todas as questoes respondidas associadas a uma questão até se apagar a si
+     * @param designation designação da questao a apagar
+     * @return retorna falso se questao não existir
+     */
     public Boolean deleteQuestao(String designation){
         Optional<Questao> optionalQuestao=this.questaoRepo.findByDesignation(designation);
         if(optionalQuestao.isPresent()){
@@ -86,10 +91,7 @@ public class QuestaoService {
 
     public void deleteAll(){
         for (Questao q:this.questaoRepo.findAll()) {
-            for (QuestaoRespondida qr:this.findAllByQuestao(q)) {
-                questaoRespondidaRepo.delete(qr);
-            }
+            deleteQuestao(q.getDesignation());
         }
-        questaoRepo.deleteAll();
     }
 }

@@ -1,6 +1,7 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Aluno;
+import edu.ufp.esof.projecto.models.MomentoRealizado;
 import edu.ufp.esof.projecto.repositories.AlunoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,12 @@ import java.util.Set;
 public class AlunoService {
 
     private AlunoRepo alunoRepo;
+    private MomentoRealizadoService momentoRealizadoService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public AlunoService(AlunoRepo alunoRepo) {
+    public AlunoService(AlunoRepo alunoRepo, MomentoRealizadoService momentoRealizadoService) {
+        this.momentoRealizadoService = momentoRealizadoService;
         this.alunoRepo = alunoRepo;
     }
 
@@ -61,6 +64,9 @@ public class AlunoService {
     public Boolean deleteAluno(String code){
         Optional<Aluno> optionalAluno=this.alunoRepo.findByCode(code);
         if(optionalAluno.isPresent()){
+            for (MomentoRealizado mr:optionalAluno.get().getMomentos()) {
+                momentoRealizadoService.deleteMomentoRealizado(mr.getId());
+            }
             alunoRepo.delete(optionalAluno.get());
             return true;
         }
@@ -68,6 +74,8 @@ public class AlunoService {
     }
 
     public void deleteAll(){
-        alunoRepo.deleteAll();
+        for (Aluno a:this.alunoRepo.findAll()) {
+            deleteAluno(a.getCode());
+        }
     }
 }

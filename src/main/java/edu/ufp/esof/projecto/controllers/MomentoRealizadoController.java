@@ -59,26 +59,6 @@ public class MomentoRealizadoController {
         throw new MomentoRealizadoController.NoMomentoRealizadoException(id);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteAllResultadosAprendizagem(){
-        this.logger.info("Delete Request for every Momento Realizado");
-
-        momentoRealizadoService.deleteAll();
-        return ResponseEntity.ok("Deleted every Momento Realizado");
-    }
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteMomentoRealizado(@PathVariable("id") Long id) throws MomentoRealizadoController.NoMomentoRealizadoException {
-        this.logger.info("Delete Request for Momento Realizado with id " + id);
-
-
-        Boolean deleted = this.momentoRealizadoService.deleteMomentoRealizado(id);
-        if(deleted){
-            return ResponseEntity.ok("Delete Momento Realizado with id = " + id);
-        }
-        throw new MomentoRealizadoController.NoMomentoRealizadoException(id);
-    }
-
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MomentoRealizado> createMomentoRealizado(@RequestBody MomentoRealizado momentoRealizado){
         this.logger.info("Create Momento Realizado Request with id = " + momentoRealizado.getId());

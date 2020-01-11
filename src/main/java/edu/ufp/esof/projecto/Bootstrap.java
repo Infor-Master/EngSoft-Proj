@@ -1,9 +1,6 @@
 package edu.ufp.esof.projecto;
 
-import edu.ufp.esof.projecto.models.Aluno;
-import edu.ufp.esof.projecto.models.Cadeira;
-import edu.ufp.esof.projecto.models.Componente;
-import edu.ufp.esof.projecto.models.Oferta;
+import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +90,5 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         //ofertaRepo.save(oferta1);
         //componenteRepo.save(componente1);
         cadeiraRepo.save(cadeira1);
-
     }
 }

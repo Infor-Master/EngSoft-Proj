@@ -57,6 +57,9 @@ public class QuestaoRespondidaService {
         return Optional.of(createdQuestaoRespondida);
     }
 
+    /**
+     *  Boolean não usado ainda mas poderá ser necessário
+     */
     public Boolean deleteQuestaoRespondida(Long id){
         Optional<QuestaoRespondida> optionalQuestaoRespondida=this.questaoRespondidaRepo.findById(id);
         if(optionalQuestaoRespondida.isPresent()){
@@ -64,9 +67,5 @@ public class QuestaoRespondidaService {
             return true;
         }
         return false;
-    }
-
-    public void deleteAll(){
-        questaoRespondidaRepo.deleteAll();
     }
 }

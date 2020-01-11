@@ -89,6 +89,11 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         Componente componente1 = new Componente("pratica", oferta1);
         //ofertaRepo.save(oferta1);
         //componenteRepo.save(componente1);
+        Criterio criterio1 = new Criterio("A", 20.0f);
+        Criterio criterio2 = new Criterio("B", 16.0f);
+        cadeira1.getCriterios().add(criterio1);
+        cadeira1.getCriterios().add(criterio2);
         cadeiraRepo.save(cadeira1);
+
     }
 }

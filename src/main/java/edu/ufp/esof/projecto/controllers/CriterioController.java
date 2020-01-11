@@ -44,7 +44,7 @@ public class CriterioController {
         throw new NoCriterioExcpetion(designation);
     }*/
 
-    @RequestMapping(value = "/{designation}", method = RequestMethod.PUT)
+    /*@RequestMapping(value = "/{designation}", method = RequestMethod.PUT)
     public ResponseEntity<Criterio>editCriterio(@PathVariable("designation") String designation, @RequestBody Criterio criterio) throws NoCriterioExcpetion{
         this.logger.info("Update Request for criterio " + designation);
 
@@ -53,17 +53,17 @@ public class CriterioController {
             return ResponseEntity.ok(optionalCriterio.get());
         }
         throw new NoCriterioExcpetion(designation);
-    }
+    }*/
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    /*@RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteAllCriterios(){
         this.logger.info("Delete Request for every criterio");
 
         criterioService.deleteAll();
         return ResponseEntity.ok("Deleted every criterio");
-    }
+    }*/
 
-    @RequestMapping(value = "/{designation}", method = RequestMethod.DELETE)
+    /*@RequestMapping(value = "/{designation}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteCriterio(@PathVariable("designation") String designation) throws NoCriterioExcpetion{
         this.logger.info("Delete Request for criterio " + designation);
 
@@ -72,9 +72,9 @@ public class CriterioController {
             return ResponseEntity.ok("Delete criterio " + designation);
         }
         throw new NoCriterioExcpetion(designation);
-    }
+    }*/
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    /*@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Criterio> createCriterio(@RequestBody Criterio criterio){
         this.logger.info("Create Criterio Request");
 
@@ -83,7 +83,7 @@ public class CriterioController {
             return ResponseEntity.ok(criterioOptional.get());
         }
         throw new CriterioAlreadyExistsExcpetion(criterio.getDesignation());
-    }
+    }*/
 
     @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Criterio não existente")
     private static class NoCriterioExcpetion extends RuntimeException {

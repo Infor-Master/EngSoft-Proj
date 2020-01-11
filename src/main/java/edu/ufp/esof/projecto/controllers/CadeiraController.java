@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -50,6 +51,11 @@ public class CadeiraController {
             return ResponseEntity.ok(optionalCadeira.get());
         }
         throw new NoNamedCadeiraException(nome);
+    }
+
+    @GetMapping(value="/search",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Iterable<Cadeira>> searchCadeiras(@RequestParam Map<String,String> query){
+        return ResponseEntity.ok(this.cadeiraService.filterCadeira(query));
     }
 
     @RequestMapping(method = RequestMethod.DELETE)

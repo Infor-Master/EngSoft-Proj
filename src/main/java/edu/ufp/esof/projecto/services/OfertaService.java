@@ -2,10 +2,14 @@ package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.repositories.OfertaRepo;
+import edu.ufp.esof.projecto.services.filters.Cadeira.FilterCadeiraObject;
+import edu.ufp.esof.projecto.services.filters.Oferta.FilterOfertaObject;
+import edu.ufp.esof.projecto.services.filters.Oferta.FilterOfertaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -13,11 +17,19 @@ import java.util.Set;
 public class OfertaService {
 
     private OfertaRepo ofertaRepo;
+    private FilterOfertaService filterService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public OfertaService(OfertaRepo ofertaRepo) {
+    public OfertaService(OfertaRepo ofertaRepo, FilterOfertaService filterService) {
         this.ofertaRepo = ofertaRepo;
+        this.filterService = filterService;
+    }
+
+    public Set<Oferta> filterOferta(Map<String, String> searchParams){
+        FilterOfertaObject filterOfertaObject= new FilterOfertaObject(searchParams);
+        Set<Oferta> ofertas=this.findAll();
+        return this.filterService.filter(ofertas, filterOfertaObject);
     }
 
     public Set<Oferta> findAll(){

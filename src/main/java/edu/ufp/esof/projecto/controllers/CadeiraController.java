@@ -2,8 +2,10 @@ package edu.ufp.esof.projecto.controllers;
 
 import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Componente;
+import edu.ufp.esof.projecto.models.Criterio;
 import edu.ufp.esof.projecto.services.CadeiraService;
 import edu.ufp.esof.projecto.services.ComponenteService;
+import edu.ufp.esof.projecto.services.CriterioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +25,13 @@ public class CadeiraController {
 
     private CadeiraService cadeiraService;
     private ComponenteService componenteService;
+    private CriterioService criterioService;
 
     @Autowired
-    public CadeiraController(CadeiraService cadeiraService, ComponenteService componenteService) {
+    public CadeiraController(CadeiraService cadeiraService, ComponenteService componenteService, CriterioService criterioService) {
         this.cadeiraService = cadeiraService;
         this.componenteService = componenteService;
+        this.criterioService = criterioService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -150,8 +154,6 @@ public class CadeiraController {
         throw new NoComponenteException(type);
     }
 
-
-    //verificar
     @PostMapping(value = "/{cadeira}/{ano}", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Componente> createComponente(@PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @RequestBody Componente componente){
         this.logger.info("Create Componente Request");
@@ -165,6 +167,31 @@ public class CadeiraController {
 
 
 
+
+    //-------------------------------------------//
+    //             CRITERIO RELATED              //
+    //-------------------------------------------//
+
+
+
+
+    @RequestMapping(value = "/{cadeira}/criterios", method = RequestMethod.GET)
+    public ResponseEntity<Iterable<Criterio>> getAllCriterios(@PathVariable("cadeira") String cadeira){
+        this.logger.info("Listing Request for criterios");
+
+        return ResponseEntity.ok(this.criterioService.findAll(cadeira));
+    }
+
+    @RequestMapping(value = "/{cadeira}/criterios/{designation}",method = RequestMethod.GET)
+    public ResponseEntity<Criterio> getCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation) throws NoCriterioExcpetion {
+        this.logger.info("Listing Request for criterio " + designation + " of " + cadeira);
+
+        Optional<Criterio> optionalCriterio =this.criterioService.findByDesignation(cadeira, designation);
+        if(optionalCriterio.isPresent()) {
+            return ResponseEntity.ok(optionalCriterio.get());
+        }
+        throw new NoCriterioExcpetion(designation);
+    }
 
 
 
@@ -214,6 +241,22 @@ public class CadeiraController {
 
         public ComponenteAlreadyExistsExcpetion(String type) {
             super("Componente " + type + " já existe");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Criterio não existente")
+    private static class NoCriterioExcpetion extends RuntimeException {
+
+        private NoCriterioExcpetion(String designation) {
+            super("Criterio " + designation + " nao existente");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Criterio já existente")
+    private static class CriterioAlreadyExistsExcpetion extends RuntimeException {
+
+        public CriterioAlreadyExistsExcpetion(String designation) {
+            super("Criterio " + designation + " já existe");
         }
     }
 }

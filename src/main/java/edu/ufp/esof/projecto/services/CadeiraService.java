@@ -1,6 +1,7 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Cadeira;
+import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

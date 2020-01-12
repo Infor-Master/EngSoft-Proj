@@ -47,13 +47,4 @@ public class Aluno {
         this.setName(name);
         this.setCode(code);
     }
-
-    public void changeName(String name){
-        this.setName(name);
-    }
-
-    public void changeCode(String code){
-        this.setCode(code);
-    }
-
 }

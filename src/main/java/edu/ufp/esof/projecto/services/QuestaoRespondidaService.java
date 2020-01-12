@@ -1,5 +1,8 @@
 package edu.ufp.esof.projecto.services;
 
+import edu.ufp.esof.projecto.models.Aluno;
+import edu.ufp.esof.projecto.models.MomentoRealizado;
+import edu.ufp.esof.projecto.models.Questao;
 import edu.ufp.esof.projecto.models.QuestaoRespondida;
 import edu.ufp.esof.projecto.repositories.QuestaoRespondidaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +53,14 @@ public class QuestaoRespondidaService {
         return Optional.empty();
     }
 
-    public Optional<QuestaoRespondida> createQuestaoRespondida(QuestaoRespondida questaoRespondida){
+    /*public Optional<QuestaoRespondida> createQuestaoRespondida(QuestaoRespondida questaoRespondida){
         Optional<QuestaoRespondida> optionalQuestaoRespondida=this.questaoRespondidaRepo.findById(questaoRespondida.getId());
         if(optionalQuestaoRespondida.isPresent()){
             return Optional.empty();
         }
         QuestaoRespondida createdQuestaoRespondida=this.questaoRespondidaRepo.save(questaoRespondida);
         return Optional.of(createdQuestaoRespondida);
-    }
+    }*/
 
     /**
      *  Boolean não usado ainda mas poderá ser necessário
@@ -82,5 +85,18 @@ public class QuestaoRespondidaService {
             qr.setCriterio(null);
         }
         questaoRespondidaRepo.delete(qr);
+    }
+
+    public void create(Questao q){
+        for (Aluno a : q.getMomento().getComponente().getAlunos()) {
+            QuestaoRespondida qr = new QuestaoRespondida(q);
+            for (MomentoRealizado mr : a.getMomentos()) {
+                if (mr.getMomento().getId() == q.getMomento().getId()){
+                    mr.getQuestoes().add(qr);
+                    questaoRespondidaRepo.save(qr);
+                    break;
+                }
+            }
+        }
     }
 }

@@ -40,6 +40,7 @@ public class Componente {
     @ManyToOne
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     //@JsonBackReference
     private Oferta oferta;
 

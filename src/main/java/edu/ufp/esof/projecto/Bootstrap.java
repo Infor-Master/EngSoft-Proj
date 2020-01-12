@@ -105,6 +105,8 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         aluno1.getComponentes().add(componente3);
         aluno2.getComponentes().add(componente3);
         aluno3.getComponentes().add(componente3);
+        Docente docente1 = new Docente("Prof", "123");
+        docenteRepo.save(docente1);
 
         //ofertaRepo.save(oferta1);
         //componenteRepo.save(componente1);

@@ -3,6 +3,7 @@ package edu.ufp.esof.projecto.services;
 import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.ComponenteRepo;
+import edu.ufp.esof.projecto.repositories.OfertaRepo;
 import edu.ufp.esof.projecto.services.filters.Componente.FilterComponenteObject;
 import edu.ufp.esof.projecto.services.filters.Componente.FilterComponenteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +16,17 @@ public class ComponenteService {
 
     private ComponenteRepo componenteRepo;
     private CadeiraRepo cadeiraRepo;
+    private OfertaRepo ofertaRepo;
     private MomentoService momentoService;
     private FilterComponenteService filterService;
 
     @Autowired
-    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, MomentoService momentoService, FilterComponenteService filterService) {
+    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, OfertaRepo ofertaRepo, MomentoService momentoService, FilterComponenteService filterService) {
         this.componenteRepo = componenteRepo;
         this.cadeiraRepo = cadeiraRepo;
         this.momentoService = momentoService;
         this.filterService = filterService;
+        this.ofertaRepo = ofertaRepo;
     }
 
     public Set<Componente> filterComponente(Map<String, String> searchParams){
@@ -102,9 +105,17 @@ public class ComponenteService {
 
     public Optional<Componente> update(Componente old, Componente newComp){
         if (newComp.getType() != null && old.getType().compareTo(newComp.getType()) != 0){
-            old.setType(newComp.getType());
+            Optional<Oferta> o = ofertaRepo.findById(old.getOferta().getId());
+            if (o.isPresent()){
+                for (Componente c : o.get().getComponentes()) {
+                    if (c.getType().compareTo(newComp.getType()) == 0){
+                        return Optional.of(old);
+                    }
+                }
+                old.setType(newComp.getType());
+                componenteRepo.save(old);
+            }
         }
-        componenteRepo.save(old);
         return Optional.of(old);
     }
 

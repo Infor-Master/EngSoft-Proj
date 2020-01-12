@@ -81,14 +81,6 @@ public class DocenteController {
         }
         throw new DocenteController.NoDocenteException(id);
     }
-    
-
-
-
-
-
-
-
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Docente> createDocente(@RequestBody Docente docente){
@@ -100,7 +92,51 @@ public class DocenteController {
         }
         throw new DocenteController.DocenteAlreadyExistsException(docente.getName());
     }
-    
+
+
+
+
+    //-------------------------------------------//
+    //              CADEIRA RELATED              //
+    //-------------------------------------------//
+
+
+
+
+    // ASSOCIAÇOES E DESASSOCIAÇOES NAO FUNCIONAM
+    //@PostMapping(value = "/{id}/{cadeira}/{ano}/{comp]", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{id}/{cadeira}/{ano}/{comp]", method = RequestMethod.PUT)
+    public ResponseEntity<String>associateDocenteComponente(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @RequestBody Object o) throws NoDocenteException {
+        this.logger.info("Associate Request for docente with id " + id + " to componente " + comp + " of " + cadeira + " in " + ano);
+
+        Boolean associated =this.docenteService.associateDocenteComponente(id, cadeira,ano,comp);
+        if(associated) {
+            return ResponseEntity.ok("Docente " + id + " e cadeira " + cadeira + " associados");
+        }
+        throw new NoDocenteException(id);
+    }
+
+    @RequestMapping(value = "/{id}/{cadeira}/{ano}/{comp]", method = RequestMethod.DELETE)
+    public ResponseEntity<String>desassociateDocenteComponente(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp) throws NoDocenteException {
+        this.logger.info("Desassociate Request for docente with id " + id + " to componente " + comp + " of " + cadeira + " in " + ano);
+
+        Boolean desassociated =this.docenteService.desassociateDocenteComponente(id, cadeira,ano,comp);
+        if(desassociated) {
+            return ResponseEntity.ok("Docente " + id + " e cadeira " + cadeira + " desassociados");
+        }
+        throw new NoDocenteException(id);
+    }
+
+
+
+
+    //-------------------------------------------//
+    //                 EXCEPTIONS                //
+    //-------------------------------------------//
+
+
+
+
     @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Docente não existente")
     private static class NoDocenteException extends RuntimeException {
 

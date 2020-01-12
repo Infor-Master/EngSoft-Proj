@@ -47,8 +47,8 @@ public class MomentoRealizadoController {
 
 
 
-
-    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    // Ver se preciso
+    /*@RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public ResponseEntity<MomentoRealizado>editMomentoRealizado(@PathVariable("id") Long id, @RequestBody MomentoRealizado momentoRealizado) throws MomentoRealizadoController.NoMomentoRealizadoException {
         this.logger.info("Update Request for Momento Realizado with id " + id);
 
@@ -68,7 +68,7 @@ public class MomentoRealizadoController {
             return ResponseEntity.ok(OptionalMR.get());
         }
         throw new MomentoRealizadoController.MomentoRealizadoAlreadyExistsExcpetion(momentoRealizado.getId());
-    }
+    }*/
     
     
     

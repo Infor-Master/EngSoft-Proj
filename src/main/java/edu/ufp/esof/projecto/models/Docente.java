@@ -25,7 +25,8 @@ public class Docente {
     private String name;
     private String code;
 
-    @OneToMany(mappedBy = "docente",cascade = CascadeType.PERSIST)
+    //@OneToMany(mappedBy = "docente",cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST)
     //@JsonManagedReference
     private Set<Componente> componentes=new HashSet<>();
 
@@ -35,4 +36,23 @@ public class Docente {
         this.setCode(code);
     }
 
+    public void associateDocenteComponente(Componente comp){
+        for (Componente c : componentes) {
+            if (c.getId() == comp.getId()){
+                return;
+            }
+        }
+        comp.setDocente(this);
+        componentes.add(comp);
+    }
+
+    public void desassociateDocenteComponente(Componente comp){
+        for (Componente c : componentes) {
+            if (c.getId() == comp.getId()){
+                comp.setDocente(null);
+                componentes.remove(comp);
+                return;
+            }
+        }
+    }
 }

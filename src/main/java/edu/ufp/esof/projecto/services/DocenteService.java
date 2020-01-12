@@ -1,7 +1,9 @@
 package edu.ufp.esof.projecto.services;
 
+import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.models.Docente;
+import edu.ufp.esof.projecto.repositories.ComponenteRepo;
 import edu.ufp.esof.projecto.repositories.DocenteRepo;
 import edu.ufp.esof.projecto.services.filters.Docente.FilterDocenteObject;
 import edu.ufp.esof.projecto.services.filters.Docente.FilterDocenteService;
@@ -15,13 +17,17 @@ import java.util.*;
 public class DocenteService {
 
     private DocenteRepo docenteRepo;
+    private ComponenteRepo componenteRepo;
     private FilterDocenteService filterService;
+    private ComponenteService componenteService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public DocenteService(DocenteRepo docenteRepo, FilterDocenteService filterService) {
+    public DocenteService(DocenteRepo docenteRepo, ComponenteRepo componenteRepo, FilterDocenteService filterService, ComponenteService componenteService) {
         this.docenteRepo = docenteRepo;
+        this.componenteRepo = componenteRepo;
         this.filterService = filterService;
+        this.componenteService = componenteService;
     }
 
 
@@ -103,5 +109,29 @@ public class DocenteService {
             d.getComponentes().remove(c);
         }
         docenteRepo.delete(d);
+    }
+
+    public boolean associateDocenteComponente(String id, String cadeira, int ano, String comp){
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(id);
+        Optional<Componente> optionalComponente = componenteService.findByType(cadeira,ano,comp);
+        if (optionalComponente.isPresent() && optionalDocente.isPresent()){
+            optionalDocente.get().associateDocenteComponente(optionalComponente.get());
+            docenteRepo.save(optionalDocente.get());
+            componenteRepo.save(optionalComponente.get());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean desassociateDocenteComponente(String id, String cadeira, int ano, String comp){
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(id);
+        Optional<Componente> optionalComponente = componenteService.findByType(cadeira,ano,comp);
+        if (optionalComponente.isPresent() && optionalDocente.isPresent()){
+            optionalDocente.get().desassociateDocenteComponente(optionalComponente.get());
+            docenteRepo.save(optionalDocente.get());
+            componenteRepo.save(optionalComponente.get());
+            return true;
+        }
+        return false;
     }
 }

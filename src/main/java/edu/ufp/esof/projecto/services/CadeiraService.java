@@ -64,6 +64,8 @@ public class CadeiraService {
         return optionalCadeira;
     }
 
+
+
     public Optional<Cadeira> createCadeira(Cadeira cadeira) {
         Optional<Cadeira> optionalCadeira=this.cadeiraRepo.findByCode(cadeira.getCode());
         if(optionalCadeira.isPresent()){

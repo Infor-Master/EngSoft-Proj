@@ -1,6 +1,7 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Cadeira;
+import edu.ufp.esof.projecto.models.Criterio;
 import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.services.filters.Cadeira.FilterCadeiraObject;
@@ -8,22 +9,23 @@ import edu.ufp.esof.projecto.services.filters.Cadeira.FilterCadeiraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CadeiraService {
 
     private CadeiraRepo cadeiraRepo;
     private FilterCadeiraService filterService;
+    private OfertaService ofertaService;
+    private CriterioService criterioService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public CadeiraService(CadeiraRepo cadeiraRepo, FilterCadeiraService filterService) {
+    public CadeiraService(CadeiraRepo cadeiraRepo, FilterCadeiraService filterService, OfertaService ofertaService, CriterioService criterioService) {
         this.cadeiraRepo = cadeiraRepo;
         this.filterService=filterService;
+        this.ofertaService = ofertaService;
+        this.criterioService = criterioService;
     }
 
     public Set<Cadeira> filterCadeira(Map<String, String> searchParams){
@@ -83,14 +85,30 @@ public class CadeiraService {
     public Boolean deleteCadeira(String code){
         Optional<Cadeira> optionalCadeira=this.cadeiraRepo.findByCode(code);
         if(optionalCadeira.isPresent()){
-            cadeiraRepo.delete(optionalCadeira.get());
+            delete(optionalCadeira.get());
             return true;
         }
         return false;
     }
 
     public void deleteAll(){
-        cadeiraRepo.deleteAll();
+        for (Cadeira c : cadeiraRepo.findAll()) {
+            delete(c);
+        }
     }
 
+    public void delete(Cadeira c){
+        while(!c.getOfertas().isEmpty()){
+            Iterator<Oferta> ofertas = c.getOfertas().iterator();
+            Oferta o = ofertas.next();
+            ofertaService.delete(o);
+        }
+        while(!c.getCriterios().isEmpty()){
+            Iterator<Criterio> criterios = c.getCriterios().iterator();
+            Criterio cr = criterios.next();
+            c.getCriterios().remove(cr);
+            criterioService.delete(cr);
+        }
+        cadeiraRepo.delete(c);
+    }
 }

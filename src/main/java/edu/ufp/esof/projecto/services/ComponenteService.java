@@ -1,8 +1,6 @@
 package edu.ufp.esof.projecto.services;
 
-import edu.ufp.esof.projecto.models.Cadeira;
-import edu.ufp.esof.projecto.models.Componente;
-import edu.ufp.esof.projecto.models.Oferta;
+import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.ComponenteRepo;
 import edu.ufp.esof.projecto.services.filters.Componente.FilterComponenteObject;
@@ -10,24 +8,21 @@ import edu.ufp.esof.projecto.services.filters.Componente.FilterComponenteService
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ComponenteService {
 
     private ComponenteRepo componenteRepo;
     private CadeiraRepo cadeiraRepo;
-    private CadeiraService cadeiraService;
+    private MomentoService momentoService;
     private FilterComponenteService filterService;
 
     @Autowired
-    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, CadeiraService cadeiraService, FilterComponenteService filterService) {
+    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, MomentoService momentoService, FilterComponenteService filterService) {
         this.componenteRepo = componenteRepo;
         this.cadeiraRepo = cadeiraRepo;
-        this.cadeiraService = cadeiraService;
+        this.momentoService = momentoService;
         this.filterService = filterService;
     }
 
@@ -82,7 +77,7 @@ public class ComponenteService {
         if(optionalComponente.isPresent()){
             return Optional.empty();
         }
-        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if (optionalCadeira.isPresent()){
             for (Oferta o : optionalCadeira.get().getOfertas()) {
                 if (o.getAno()==ano){
@@ -109,17 +104,18 @@ public class ComponenteService {
 
     public Boolean deleteComponente(String cadeira, int ano, String type){
         Optional<Componente> optionalComponente = findByType(cadeira,ano,type);
-        //Optional<Componente> optionalComponente=this.componenteRepo.findByType(type);
         if(optionalComponente.isPresent()){
             for (Componente c : optionalComponente.get().getOferta().getComponentes()) {
                if (c.getType().compareTo(type) == 0){
-                   optionalComponente.get().getOferta().getComponentes().remove(c);
-                   break;
+                   delete(c);
+                   return true;
+                   //optionalComponente.get().getOferta().getComponentes().remove(c);
+                   //break;
                }
             }
-            optionalComponente.get().setOferta(null);
-            componenteRepo.delete(optionalComponente.get());
-            return true;
+           // optionalComponente.get().setOferta(null);
+            //componenteRepo.delete(optionalComponente.get());
+            //return true;
         }
         return false;
     }
@@ -130,12 +126,44 @@ public class ComponenteService {
             for (Oferta o : optionalCadeira.get().getOfertas()) {
                 if (o.getAno() == ano){
                     for (Componente c : o.getComponentes()) {
-                        o.setComponentes(new HashSet<>());
-                        c.setOferta(null);
-                        componenteRepo.deleteById(c.getId());
+                        delete(c);
+                        //o.setComponentes(new HashSet<>());
+                        //c.setOferta(null);
+                        //componenteRepo.deleteById(c.getId());
                     }
                 }
             }
         }
+    }
+
+    public void delete(Componente c){
+        if (c.getDocente() != null){
+            c.getDocente().getComponentes().remove(c);
+            c.setDocente(null);
+        }
+        while(!c.getAlunos().isEmpty()){
+            Iterator<Aluno> alunos = c.getAlunos().iterator();
+            Aluno a = alunos.next();
+            a.getComponentes().remove(c);
+            c.getAlunos().remove(a);
+        }
+        while(!c.getMomentos().isEmpty()){
+            Iterator<Momento> momentos = c.getMomentos().iterator();
+            Momento m = momentos.next();
+            momentoService.delete(m);
+        }
+        /*
+        for (Aluno a : c.getAlunos()) {
+            a.getComponentes().remove(c);
+            c.getAlunos().remove(a);
+        }
+        for (Momento m : c.getMomentos()) {
+            momentoService.delete(m);
+        }*/
+        if (c.getOferta() != null){
+            c.getOferta().getComponentes().remove(c);
+            c.setOferta(null);
+        }
+        componenteRepo.delete(c);
     }
 }

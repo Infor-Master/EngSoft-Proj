@@ -1,5 +1,6 @@
 package edu.ufp.esof.projecto.services;
 
+import edu.ufp.esof.projecto.models.Questao;
 import edu.ufp.esof.projecto.models.ResultadoAprendizagem;
 import edu.ufp.esof.projecto.repositories.ResultadoAprendizagemRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,7 @@ public class ResultadoAprendizagemService {
         return Optional.empty();
     }
 
+    // Falta fazer
     public Boolean deleteResultadoAprendizagem(String designation){
         Optional<ResultadoAprendizagem> optionalRA = this.resultadoAprendizagemRepo.findByDesignation(designation);
         if (optionalRA.isPresent()){
@@ -66,7 +68,20 @@ public class ResultadoAprendizagemService {
         return false;
     }
 
+    // Falta fazer
     public void deleteAll(){
         resultadoAprendizagemRepo.deleteAll();
+    }
+
+    public void delete(ResultadoAprendizagem ra){
+        if (ra.getOferta() != null){
+            ra.getOferta().getRas().remove(ra);
+            ra.setOferta(null);
+        }
+        for (Questao q : ra.getQuestoes()) {
+            q.setRa(null);
+            ra.getQuestoes().remove(q);
+        }
+        resultadoAprendizagemRepo.delete(ra);
     }
 }

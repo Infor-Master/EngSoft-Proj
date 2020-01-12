@@ -39,7 +39,7 @@ public class Questao {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     //@JsonBackReference
-    private Momento ra;
+    private ResultadoAprendizagem ra;
 
     public Questao(String designation, Float pesoMomento, Float pesoRA){
         this.setDesignation(designation);

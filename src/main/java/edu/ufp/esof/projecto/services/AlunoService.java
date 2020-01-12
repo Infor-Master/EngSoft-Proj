@@ -1,12 +1,14 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Aluno;
+import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.models.MomentoRealizado;
 import edu.ufp.esof.projecto.repositories.AlunoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -64,10 +66,11 @@ public class AlunoService {
     public Boolean deleteAluno(String code){
         Optional<Aluno> optionalAluno=this.alunoRepo.findByCode(code);
         if(optionalAluno.isPresent()){
-            for (MomentoRealizado mr:optionalAluno.get().getMomentos()) {
+            /*for (MomentoRealizado mr:optionalAluno.get().getMomentos()) {
                 momentoRealizadoService.deleteMomentoRealizado(mr.getId());
             }
-            alunoRepo.delete(optionalAluno.get());
+            alunoRepo.delete(optionalAluno.get());*/
+            delete(optionalAluno.get());
             return true;
         }
         return false;
@@ -75,7 +78,30 @@ public class AlunoService {
 
     public void deleteAll(){
         for (Aluno a:this.alunoRepo.findAll()) {
-            deleteAluno(a.getCode());
+            delete(a);
         }
+    }
+
+    public void delete(Aluno a){
+        /*while(!a.getComponentes().isEmpty()){
+            Iterator<Componente> componentes = a.getComponentes().iterator();
+            Componente c = componentes.next();
+            c.getAlunos().remove(a);
+            a.getComponentes().remove(c);
+        }*/
+        for (Componente c : a.getComponentes()) {
+            c.getAlunos().remove(a);
+            a.getComponentes().remove(c);
+        }
+        while(!a.getMomentos().isEmpty()){
+            Iterator<MomentoRealizado> momentos = a.getMomentos().iterator();
+            MomentoRealizado mr = momentos.next();
+            momentoRealizadoService.delete(mr);
+        }
+        /*
+        for (MomentoRealizado mr : a.getMomentos()) {
+            momentoRealizadoService.delete(mr);
+        }*/
+        alunoRepo.delete(a);
     }
 }

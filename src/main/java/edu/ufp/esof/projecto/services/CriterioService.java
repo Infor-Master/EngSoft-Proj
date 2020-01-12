@@ -2,6 +2,7 @@ package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Criterio;
+import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.CriterioRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,17 +17,18 @@ import java.util.Set;
 public class CriterioService {
 
     private CriterioRepo criterioRepo;
-    private CadeiraService cadeiraService;
+    private CadeiraRepo cadeiraRepo;
+    //private CadeiraService cadeiraService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public CriterioService(CriterioRepo criterioRepo, CadeiraService cadeiraService) {
+    public CriterioService(CriterioRepo criterioRepo, CadeiraRepo cadeiraRepo) {
         this.criterioRepo = criterioRepo;
-        this.cadeiraService = cadeiraService;
+        this.cadeiraRepo = cadeiraRepo;
     }
 
     public Set<Criterio> findAll(String cadeira) {
-        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         Set<Criterio> criterios=new HashSet<>();
         if (optionalCadeira.isPresent()){
             for(Criterio c: optionalCadeira.get().getCriterios()){
@@ -47,7 +49,7 @@ public class CriterioService {
     }
 
     public Optional<Criterio> createCriterio(String cadeira, Criterio criterio) {
-        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if (optionalCadeira.isPresent()){
             for (Criterio c : optionalCadeira.get().getCriterios()) {
                 if (c.getDesignation().compareTo(criterio.getDesignation())==0){
@@ -62,7 +64,7 @@ public class CriterioService {
     }
 
     public Optional<Criterio> updateCriterio(String cadeira, String designation, Criterio criterio){
-        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if (optionalCadeira.isPresent()){
             for (Criterio c : optionalCadeira.get().getCriterios()) {
                 if (c.getDesignation().compareTo(designation)==0){
@@ -76,7 +78,7 @@ public class CriterioService {
     }
 
     public Boolean deleteCriterio(String cadeira, String designation){
-        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if (optionalCadeira.isPresent()){
             for (Criterio c : optionalCadeira.get().getCriterios()) {
                 if (c.getDesignation().compareTo(designation) == 0){
@@ -90,7 +92,7 @@ public class CriterioService {
     }
 
     public void deleteAll(String cadeira){
-        Optional<Cadeira> optionalCadeira = cadeiraService.findByName(cadeira);
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if(optionalCadeira.isPresent()){
             while(!optionalCadeira.get().getCriterios().isEmpty()){
                 Iterator<Criterio> criterios = optionalCadeira.get().getCriterios().iterator();
@@ -99,5 +101,9 @@ public class CriterioService {
                 criterioRepo.delete(c);
             }
         }
+    }
+
+    public void delete(Criterio c){
+        criterioRepo.delete(c);
     }
 }

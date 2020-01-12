@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,12 +19,14 @@ public class MomentoService {
     private MomentoRepo momentoRepo;
     private MomentoRealizadoRepo momentoRealizadoRepo;
     private QuestaoService questaoService;
+    private MomentoRealizadoService momentoRealizadoService;
 
     @Autowired
-    public MomentoService(MomentoRepo momentoRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoService questaoService) {
+    public MomentoService(MomentoRepo momentoRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoService questaoService, MomentoRealizadoService momentoRealizadoService) {
         this.momentoRepo = momentoRepo;
         this.momentoRealizadoRepo = momentoRealizadoRepo;
         this.questaoService = questaoService;
+        this.momentoRealizadoService = momentoRealizadoService;
     }
 
 
@@ -75,6 +78,7 @@ public class MomentoService {
     }
 
 
+    // FALTA FAZER
     /**
      * Apaga todas as questoes associadas a um momento (apagando as respondidas), seguido dos momentos realizados até se apagar a si
      * @param designation designação do momento a apagar
@@ -96,9 +100,33 @@ public class MomentoService {
         return false;
     }
 
+    // falta fazer e por a receber cadeira, ano e componente
     public void deleteAll(){
         for (Momento m:this.momentoRepo.findAll()) {
             deleteMomento(m.getDesignation());
         }
+    }
+
+    public void delete(Momento m){
+        if (m.getComponente() != null){
+            m.getComponente().getMomentos().remove(m);
+            m.setComponente(null);
+        }
+        while(!m.getQuestoes().isEmpty()){
+            Iterator<Questao> questoes = m.getQuestoes().iterator();
+            Questao q = questoes.next();
+            questaoService.delete(q);
+        }
+        /*
+        for (Questao q : m.getQuestoes()) {
+            questaoService.delete(q);
+        }*/
+        Optional<Iterable<MomentoRealizado>> optionalMomentoRealizado =momentoRealizadoRepo.findAllByMomento(m);
+        if (optionalMomentoRealizado.isPresent()){
+            for (MomentoRealizado mr : optionalMomentoRealizado.get()) {
+                momentoRealizadoService.delete(mr);
+            }
+        }
+        momentoRepo.delete(m);
     }
 }

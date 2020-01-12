@@ -62,7 +62,7 @@ public class AlunoController {
     public ResponseEntity<String> deleteAllAlunos(){
         this.logger.info("Delete Request for every aluno");
 
-        alunoService.deleteAll();
+        this.alunoService.deleteAll();
         return ResponseEntity.ok("Deleted every aluno");
     }
 

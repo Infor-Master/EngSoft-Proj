@@ -1,6 +1,5 @@
 package edu.ufp.esof.projecto.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Componente;
@@ -19,12 +18,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.booleanThat;
 import static org.mockito.Mockito.when;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -102,7 +98,36 @@ class CadeiraControllerTest {
     }
 
     @Test
-    void searchCadeiras() {
+    void searchCadeiras() throws Exception {
+        Cadeira cadeira1=new Cadeira("cadeira1", "111");
+        Set<Cadeira> cadeiras=new HashSet<>();
+        cadeiras.add(cadeira1);
+        Map<String, String> Query = new HashMap<String, String>();
+        Query.put("codigo", "111");
+        when(this.cadeiraService.filterCadeira(Query)).thenReturn(cadeiras);
+        String responseJson=this.mockMvc.perform(
+                get("/cadeira/search?codigo=111")
+        ).andExpect(
+                status().isOk()
+        ).andReturn().getResponse().getContentAsString();
+
+        JSONArray jsonArray = new JSONArray(responseJson);
+        for(int i=0; i<jsonArray.length(); i++){
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            String cadeirajson = jsonObject.toString();
+            Cadeira cadeiraresp = this.objectMapper.readValue(cadeirajson, Cadeira.class);
+            assertEquals(cadeiraresp, cadeira1);
+        }
+        assertNotEquals(jsonArray.length(), 0);
+
+        String BADresponseJson=this.mockMvc.perform(
+                get("/cadeira/search?codigo=222")
+        ).andExpect(
+                status().isOk()
+        ).andReturn().getResponse().getContentAsString();
+
+        JSONArray BADjsonArray = new JSONArray(BADresponseJson);
+        assertEquals(BADjsonArray.length(), 0);
     }
 
     @Test

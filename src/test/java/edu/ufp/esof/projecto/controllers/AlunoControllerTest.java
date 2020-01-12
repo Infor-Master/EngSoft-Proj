@@ -107,11 +107,23 @@ class AlunoControllerTest {
     }
 
     @Test
-    void deleteAllAlunos() {
+    void deleteAllAlunos() throws Exception {
+        this.mockMvc.perform(
+                delete("/aluno/")
+        ).andExpect(status().isOk());
     }
 
     @Test
-    void deleteAluno() {
+    void deleteAluno() throws Exception {
+        Aluno aluno=new Aluno("aluno", "123");
+        when(this.alunoService.deleteAluno("123")).thenReturn(true);
+        this.mockMvc.perform(
+                delete("/aluno/123").contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpect(status().isOk());
+
+        this.mockMvc.perform(
+                delete("/aluno/1234").contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpect(status().isNotFound());
     }
 
     @Test

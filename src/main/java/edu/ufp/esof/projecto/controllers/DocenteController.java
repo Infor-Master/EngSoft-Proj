@@ -1,7 +1,9 @@
 package edu.ufp.esof.projecto.controllers;
 
 import edu.ufp.esof.projecto.models.Docente;
+import edu.ufp.esof.projecto.models.Momento;
 import edu.ufp.esof.projecto.services.DocenteService;
+import edu.ufp.esof.projecto.services.MomentoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,12 @@ public class DocenteController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private DocenteService docenteService;
+    private MomentoService momentoService;
 
     @Autowired
-    public DocenteController(DocenteService docenteService) {
+    public DocenteController(DocenteService docenteService, MomentoService momentoService) {
         this.docenteService = docenteService;
+        this.momentoService = momentoService;
     }
 
 
@@ -48,7 +52,7 @@ public class DocenteController {
         if(optionalDocente.isPresent()) {
             return ResponseEntity.ok(optionalDocente.get());
         }
-        throw new DocenteController.NoDocenteException(id);
+        throw new NoDocenteException(id);
     }
 
 
@@ -60,7 +64,7 @@ public class DocenteController {
         if(optionalDocente.isPresent()) {
             return ResponseEntity.ok(optionalDocente.get());
         }
-        throw new DocenteController.NoDocenteException(id);
+        throw new NoDocenteException(id);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
@@ -106,7 +110,7 @@ public class DocenteController {
     // ASSOCIAÇOES E DESASSOCIAÇOES NAO FUNCIONAM
     //@PostMapping(value = "/{id}/{cadeira}/{ano}/{comp]", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/{id}/{cadeira}/{ano}/{comp]", method = RequestMethod.PUT)
-    public ResponseEntity<String>associateDocenteComponente(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @RequestBody Object o) throws NoDocenteException {
+    public ResponseEntity<String>associateDocenteComponente(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp) throws NoDocenteException {
         this.logger.info("Associate Request for docente with id " + id + " to componente " + comp + " of " + cadeira + " in " + ano);
 
         Boolean associated =this.docenteService.associateDocenteComponente(id, cadeira,ano,comp);
@@ -131,6 +135,40 @@ public class DocenteController {
 
 
     //-------------------------------------------//
+    //              MOMENTO RELATED              //
+    //-------------------------------------------//
+
+
+
+
+    @PostMapping(value = "/{id}/{cadeira}/{ano}/{comp]/momento", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Momento> createMomento(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @RequestBody Momento momento){
+        this.logger.info("Create Momento Request");
+
+        Optional<Momento> momentoOptional=this.momentoService.createMomento(id,cadeira,ano,comp,momento);
+        if(momentoOptional.isPresent()){
+            return ResponseEntity.ok(momentoOptional.get());
+        }
+        throw new MomentoAlreadyExistsException(momento.getDesignation());
+    }
+
+
+    @RequestMapping(value = "/{id}/{cadeira}/{ano}/{comp]/momento/{nome}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteMomento(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @PathVariable("nome") String nome) throws NoMomentoException {
+        this.logger.info("Delete Request for docente with id " + id);
+
+        Boolean deleted = this.momentoService.deleteMomento(cadeira,ano,comp,nome);
+        if(deleted) {
+            return ResponseEntity.ok("Deleted momento " + nome);
+        }
+        throw new DocenteController.NoDocenteException(id);
+    }
+
+
+
+
+
+    //-------------------------------------------//
     //                 EXCEPTIONS                //
     //-------------------------------------------//
 
@@ -150,6 +188,21 @@ public class DocenteController {
 
         public DocenteAlreadyExistsException(String name) {
             super("Docente com nome: " + name + " já existe");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Momento já existente")
+    private static class MomentoAlreadyExistsException extends RuntimeException {
+
+        public MomentoAlreadyExistsException(String name) {
+            super("Momento com nome: " + name + " já existe");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.NOT_FOUND, reason = "Momento não existente")
+    private static class NoMomentoException extends RuntimeException{
+        private NoMomentoException(String nome){
+            super("Momento " + nome + " não existente");
         }
     }
 }

@@ -1,8 +1,8 @@
 package edu.ufp.esof.projecto.services;
 
-import edu.ufp.esof.projecto.models.Momento;
-import edu.ufp.esof.projecto.models.MomentoRealizado;
-import edu.ufp.esof.projecto.models.Questao;
+import edu.ufp.esof.projecto.models.*;
+import edu.ufp.esof.projecto.repositories.CadeiraRepo;
+import edu.ufp.esof.projecto.repositories.DocenteRepo;
 import edu.ufp.esof.projecto.repositories.MomentoRealizadoRepo;
 import edu.ufp.esof.projecto.repositories.MomentoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +17,21 @@ import java.util.Set;
 public class MomentoService {
 
     private MomentoRepo momentoRepo;
+    private DocenteRepo docenteRepo;
+    private CadeiraRepo cadeiraRepo;
     private MomentoRealizadoRepo momentoRealizadoRepo;
     private QuestaoService questaoService;
     private MomentoRealizadoService momentoRealizadoService;
 
+
     @Autowired
-    public MomentoService(MomentoRepo momentoRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoService questaoService, MomentoRealizadoService momentoRealizadoService) {
+    public MomentoService(DocenteRepo docenteRepo, CadeiraRepo cadeiraRepo, MomentoRepo momentoRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoService questaoService, MomentoRealizadoService momentoRealizadoService) {
         this.momentoRepo = momentoRepo;
         this.momentoRealizadoRepo = momentoRealizadoRepo;
         this.questaoService = questaoService;
         this.momentoRealizadoService = momentoRealizadoService;
+        this.docenteRepo = docenteRepo;
+        this.cadeiraRepo = cadeiraRepo;
     }
 
 
@@ -59,52 +64,19 @@ public class MomentoService {
         return momentosRealizados;
     }
 
-    public Optional<Momento> createMomento(Momento momento){
-        Optional<Momento> optionalMomento=this.momentoRepo.findByDesignation(momento.getDesignation());
-        if(optionalMomento.isPresent()){
-            return Optional.empty();
-        }
-        Momento createdMomento=this.momentoRepo.save(momento);
-        return Optional.of(createdMomento);
-    }
-
-    public Optional<Momento> updateMomento(String designation, Momento m){
-        Optional<Momento> optionalMomento = this.momentoRepo.findByDesignation(designation);
-        if(optionalMomento.isPresent()){
-            momentoRepo.save(m);
-            return optionalMomento;
-        }
-        return Optional.empty();
-    }
 
 
-    // FALTA FAZER
-    /**
-     * Apaga todas as questoes associadas a um momento (apagando as respondidas), seguido dos momentos realizados até se apagar a si
-     * @param designation designação do momento a apagar
-     * @return retorna falso se momento não existir
-     */
-    public Boolean deleteMomento(String designation){
-        Optional<Momento> optionalMomento = this.momentoRepo.findByDesignation(designation);
-        if (optionalMomento.isPresent()){
-            for (Questao q:optionalMomento.get().getQuestoes()) {
-                this.questaoService.deleteQuestao(q.getDesignation());
+    public Boolean deleteMomento(String cadeira, int ano, String comp, String designation){
+        Optional<Componente> optionalComponente = findComponenteByType(cadeira,ano,comp);
+        if (optionalComponente.isPresent()){
+            for (Momento m:optionalComponente.get().getMomentos()) {
+                if (m.getDesignation().compareTo(designation) == 0){
+                    delete(m);
+                    return true;
+                }
             }
-
-            for (MomentoRealizado mr:this.findAllByMomento(optionalMomento.get())){
-                momentoRealizadoRepo.delete(mr);
-            }
-            momentoRepo.delete(optionalMomento.get());
-            return true;
         }
         return false;
-    }
-
-    // falta fazer e por a receber cadeira, ano e componente
-    public void deleteAll(){
-        for (Momento m:this.momentoRepo.findAll()) {
-            deleteMomento(m.getDesignation());
-        }
     }
 
     public void delete(Momento m){
@@ -129,4 +101,50 @@ public class MomentoService {
         }
         momentoRepo.delete(m);
     }
+
+    public Optional<Momento> createMomento(String id, String cadeira, int ano, String comp, Momento momento){
+        if (momento.getDesignation() == null){
+            return Optional.empty();
+        }
+        Optional<Componente> optionalComponente = findComponenteByType(cadeira,ano,comp);
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(id);
+        if (optionalComponente.isPresent() && optionalDocente.isPresent()){
+            if (optionalDocente.get().getComponentes().contains(optionalComponente.get())){
+                Float peso = 0.0f;
+                for (Momento m : optionalComponente.get().getMomentos()) {
+                    peso = peso + m.getPeso();
+                    if (m.getDesignation().compareTo(momento.getDesignation()) == 0 || peso>1.0f){
+                        return Optional.empty();
+                    }
+                }
+                momento.setComponente(optionalComponente.get());
+                optionalComponente.get().getMomentos().add(momento);
+                momentoRepo.save(momento);
+                //componenteRepo.save(optionalComponente.get()); // verificar se deve estar ou nao
+                momentoRealizadoService.create(momento);
+                return Optional.of(momento);
+            }
+        }
+        return Optional.empty();
+    }
+
+
+    public Optional<Componente> findComponenteByType(String cadeira, int ano, String type) {
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
+        Optional<Componente> optionalComponente = Optional.empty();
+        if (optionalCadeira.isPresent()){
+            for (Oferta o : optionalCadeira.get().getOfertas()) {
+                if (o.getAno() == ano){
+                    for (Componente c : o.getComponentes()) {
+                        if (c.getType().compareTo(type) == 0){
+                            optionalComponente = Optional.of(c);
+                            return optionalComponente;
+                        }
+                    }
+                }
+            }
+        }
+        return optionalComponente;
+    }
 }
+

@@ -43,7 +43,7 @@ public class MomentoController {
         throw new MomentoController.NoMomentoException(designation);
     }
 
-    @RequestMapping(value = "{designation}", method = RequestMethod.PUT)
+    /*@RequestMapping(value = "{designation}", method = RequestMethod.PUT)
     public ResponseEntity<Momento>editMomento(@PathVariable("designation") String designation, @RequestBody Momento momento) throws MomentoController.NoMomentoException {
         this.logger.info("Update Request for Momento with designation " + designation);
 
@@ -83,7 +83,7 @@ public class MomentoController {
             return ResponseEntity.ok(OptionalRA.get());
         }
         throw new MomentoController.MomentoAlreadyExistsExcpetion(momento.getDesignation());
-    }
+    }*/
 
     @ResponseStatus(value= HttpStatus.NOT_FOUND, reason = "Momento não existente")
     private static class NoMomentoException extends RuntimeException{

@@ -1,6 +1,7 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Aluno;
+import edu.ufp.esof.projecto.models.Momento;
 import edu.ufp.esof.projecto.models.MomentoRealizado;
 import edu.ufp.esof.projecto.models.QuestaoRespondida;
 import edu.ufp.esof.projecto.repositories.MomentoRealizadoRepo;
@@ -85,5 +86,14 @@ public class MomentoRealizadoService {
             questaoRespondidaService.delete(qr);
         }*/
         momentoRealizadoRepo.delete(mr);
+    }
+
+    public void create(Momento m){
+        for (Aluno a : m.getComponente().getAlunos()) {
+            MomentoRealizado mr = new MomentoRealizado(m);
+            a.getMomentos().add(mr);
+            mr.setAluno(a);
+            momentoRealizadoRepo.save(mr);
+        }
     }
 }

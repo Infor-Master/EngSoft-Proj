@@ -2,6 +2,7 @@ package edu.ufp.esof.projecto.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class Cadeira {
     private String code;
 
     @OneToMany(cascade = CascadeType.PERSIST)
+    @JsonIgnore
     //@JsonManagedReference
     private Set<Oferta> ofertas = new HashSet<>();
 

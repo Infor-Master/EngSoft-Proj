@@ -68,21 +68,38 @@ public class CriterioService {
         if (optionalCadeira.isPresent()){
             for (Criterio c : optionalCadeira.get().getCriterios()) {
                 if (c.getDesignation().compareTo(designation)==0){
-                    c=criterio;
-                    criterioRepo.save(criterio);
-                    return Optional.of(criterio);
+                    return update(optionalCadeira.get(),c,criterio);
                 }
             }
         }
         return Optional.empty();
     }
 
-    public Optional<Criterio> update(Criterio old, Criterio newCr){
+
+    public Optional<Criterio> update(Cadeira c, Criterio old, Criterio newCr){
+        Boolean check = true;
         if (newCr.getDesignation() != null && old.getDesignation().compareTo(newCr.getDesignation()) != 0){
-            old.setDesignation(newCr.getDesignation());
+            for (Criterio cr : c.getCriterios()) {
+                if(cr.getDesignation().compareTo(newCr.getDesignation()) == 0){
+                    check=false;
+                    break;
+                }
+            }
+            if (check){
+                old.setDesignation(newCr.getDesignation());
+            }
+            check = true;
         }
         if (newCr.getNota() != old.getNota()){
-            old.setNota(newCr.getNota());
+            for (Criterio cr : c.getCriterios()) {
+                if (cr.getNota() == newCr.getNota()){
+                    check = false;
+                    break;
+                }
+            }
+            if (check){
+                old.setNota(newCr.getNota());
+            }
         }
         criterioRepo.save(old);
         return Optional.of(old);

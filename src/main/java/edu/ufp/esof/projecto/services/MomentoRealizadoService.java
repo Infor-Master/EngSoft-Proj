@@ -37,28 +37,28 @@ public class MomentoRealizadoService {
         return optionalMR;
     }
 
-    public Optional<MomentoRealizado> createMomentoRealizado(MomentoRealizado momentoRealizado){
+    /*public Optional<MomentoRealizado> createMomentoRealizado(MomentoRealizado momentoRealizado){
         Optional<MomentoRealizado> optionalMR=this.momentoRealizadoRepo.findById(momentoRealizado.getId());
         if(optionalMR.isPresent()){
             return Optional.empty();
         }
         MomentoRealizado createdMR=this.momentoRealizadoRepo.save(momentoRealizado);
         return Optional.of(createdMR);
-    }
+    }*/
 
-    public Optional<MomentoRealizado> updateMomentoRealizado(Long id, MomentoRealizado momento){
+    /*public Optional<MomentoRealizado> updateMomentoRealizado(Long id, MomentoRealizado momento){
         Optional<MomentoRealizado> optionalMR = this.momentoRealizadoRepo.findById(id);
         if(optionalMR.isPresent()){
             momentoRealizadoRepo.save(momento);
             return optionalMR;
         }
         return Optional.empty();
-    }
+    }*/
 
     /**
      *  Boolean não usado ainda mas poderá ser necessário
      */
-    public Boolean deleteMomentoRealizado(Long id){
+    /*public Boolean deleteMomentoRealizado(Long id){
         Optional<MomentoRealizado> optionalMomentoRealizado=this.momentoRealizadoRepo.findById(id);
         if(optionalMomentoRealizado.isPresent()){
             for (QuestaoRespondida qr:optionalMomentoRealizado.get().getQuestoes()) {
@@ -68,7 +68,7 @@ public class MomentoRealizadoService {
             return true;
         }
         return false;
-    }
+    }*/
 
     public void delete(MomentoRealizado mr){
         if (mr.getAluno() != null){

@@ -62,10 +62,23 @@ public class DocenteService {
     public Optional<Docente> updateDocente(String code, Docente docente){
         Optional<Docente> optionalDocente=this.docenteRepo.findByCode(code);
         if(optionalDocente.isPresent()){
-            docenteRepo.save(docente);
-            return optionalDocente;
+            return update(optionalDocente.get(),docente);
         }
         return Optional.empty();
+    }
+
+    public Optional<Docente> update(Docente old, Docente newDoc){
+        if (newDoc.getName() != null && old.getName().compareTo(newDoc.getName()) != 0){
+            old.setName(newDoc.getName());
+        }
+        if (newDoc.getCode() != null && old.getCode().compareTo(newDoc.getCode()) != 0){
+            Optional<Docente> test = docenteRepo.findByCode(newDoc.getCode());
+            if (test.isEmpty()){
+                old.setCode(newDoc.getCode());
+            }
+        }
+        docenteRepo.save(old);
+        return Optional.of(old);
     }
 
     public Boolean deleteDocente(String code){

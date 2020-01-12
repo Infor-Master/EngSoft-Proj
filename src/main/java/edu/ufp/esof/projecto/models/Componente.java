@@ -54,18 +54,6 @@ public class Componente {
         oferta.getComponentes().add(this);
     }
 
-    /**
-     * Editar o tipo de componente
-     * @param type tipo de Componente
-     */
-    public void changeType(String type){
-        setType(type);
-    }
-
-    /**
-     * Adiciona docente à cadeira
-     * @param d Docente a adicionar
-     */
     public void addDocente(Docente d){
         if (docente == null){
             docente = d;
@@ -73,10 +61,6 @@ public class Componente {
         }
     }
 
-    /**
-     * Remove docente da cadeira
-     * @return Docente removido
-     */
     public Docente removeDocente(){
         Docente d = docente;
         if (docente != null){

@@ -57,10 +57,23 @@ public class AlunoService {
     public Optional<Aluno> updateAluno(String code, Aluno aluno){
         Optional<Aluno> optionalAluno=this.alunoRepo.findByCode(code);
         if(optionalAluno.isPresent()){
-            alunoRepo.save(aluno);
-            return optionalAluno;
+            return update(optionalAluno.get(),aluno);
         }
         return Optional.empty();
+    }
+
+    public Optional<Aluno> update(Aluno old, Aluno newAluno){
+        if (newAluno.getName() != null && old.getName().compareTo(newAluno.getName()) != 0){
+            old.setName(newAluno.getName());
+        }
+        if (newAluno.getCode() != null && old.getCode().compareTo(newAluno.getCode()) != 0){
+            Optional<Aluno> test = alunoRepo.findByCode(newAluno.getCode());
+            if (test.isEmpty()){
+                old.setCode(newAluno.getCode());
+            }
+        }
+        alunoRepo.save(old);
+        return Optional.of(old);
     }
 
     public Boolean deleteAluno(String code){

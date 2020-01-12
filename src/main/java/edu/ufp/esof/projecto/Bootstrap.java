@@ -87,6 +87,25 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         Oferta oferta1 = new Oferta(2020,cadeira1);
         Oferta oferta2 = new Oferta(2019,cadeira1);
         Componente componente1 = new Componente("pratica", oferta1);
+        Componente componente2 = new Componente("teorica", oferta1);
+        Componente componente3 = new Componente("teorica", oferta2);
+        componente3.getAlunos().add(aluno1);
+        componente3.getAlunos().add(aluno2);
+        componente3.getAlunos().add(aluno3);
+        componente1.getAlunos().add(aluno1);
+        componente1.getAlunos().add(aluno2);
+        componente1.getAlunos().add(aluno3);
+        componente2.getAlunos().add(aluno1);
+        componente2.getAlunos().add(aluno2);
+        aluno1.getComponentes().add(componente1);
+        aluno1.getComponentes().add(componente2);
+        aluno2.getComponentes().add(componente1);
+        aluno2.getComponentes().add(componente2);
+        aluno3.getComponentes().add(componente1);
+        aluno1.getComponentes().add(componente3);
+        aluno2.getComponentes().add(componente3);
+        aluno3.getComponentes().add(componente3);
+
         //ofertaRepo.save(oferta1);
         //componenteRepo.save(componente1);
         Criterio criterio1 = new Criterio("A", 20.0f);

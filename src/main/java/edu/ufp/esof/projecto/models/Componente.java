@@ -1,9 +1,6 @@
 package edu.ufp.esof.projecto.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -36,6 +33,8 @@ public class Componente {
 
     @ManyToMany
     //@JsonBackReference(value = "alunos-componentes")
+    @ToString.Exclude   // perguntar ao professor
+    @EqualsAndHashCode.Exclude  // perguntar ao professor
     private Set<Aluno> alunos=new HashSet<>();
 
     @ManyToOne

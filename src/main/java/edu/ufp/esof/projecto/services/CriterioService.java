@@ -77,6 +77,17 @@ public class CriterioService {
         return Optional.empty();
     }
 
+    public Optional<Criterio> update(Criterio old, Criterio newCr){
+        if (newCr.getDesignation() != null && old.getDesignation().compareTo(newCr.getDesignation()) != 0){
+            old.setDesignation(newCr.getDesignation());
+        }
+        if (newCr.getNota() != old.getNota()){
+            old.setNota(newCr.getNota());
+        }
+        criterioRepo.save(old);
+        return Optional.of(old);
+    }
+
     public Boolean deleteCriterio(String cadeira, String designation){
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if (optionalCadeira.isPresent()){

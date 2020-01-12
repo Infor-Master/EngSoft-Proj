@@ -76,10 +76,23 @@ public class CadeiraService {
     public Optional<Cadeira> updateCadeira(String name, Cadeira cadeira){
         Optional<Cadeira> optionalCadeira=this.cadeiraRepo.findByDesignation(name);
         if(optionalCadeira.isPresent()){
-            cadeiraRepo.save(cadeira);
-            return optionalCadeira;
+            return update(optionalCadeira.get(),cadeira);
         }
         return Optional.empty();
+    }
+
+    public Optional<Cadeira> update(Cadeira old, Cadeira newCadeira){
+        if (newCadeira.getDesignation() != null && old.getDesignation().compareTo(newCadeira.getDesignation()) != 0){
+            old.setDesignation(newCadeira.getDesignation());
+        }
+        if (newCadeira.getCode() != null && old.getCode().compareTo(newCadeira.getCode()) != 0){
+            Optional<Cadeira> test = cadeiraRepo.findByCode(newCadeira.getCode());
+            if (test.isEmpty()){
+                old.setCode(newCadeira.getCode());
+            }
+        }
+        cadeiraRepo.save(old);
+        return Optional.of(old);
     }
 
     public Boolean deleteCadeira(String code){

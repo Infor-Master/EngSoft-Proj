@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -31,7 +33,9 @@ public class Aluno {
 
     @ManyToMany(mappedBy = "alunos", cascade = CascadeType.PERSIST)
     //@JsonManagedReference(value = "alunos-componentes")
-    //@JsonIgnore
+    @JsonIgnore     // perguntar ao professor
+    @ToString.Exclude   // perguntar ao professor
+    @EqualsAndHashCode.Exclude  // perguntar ao professor
     private Set<Componente> componentes=new HashSet<>();
 
     @OneToMany(mappedBy = "aluno",cascade = CascadeType.PERSIST)

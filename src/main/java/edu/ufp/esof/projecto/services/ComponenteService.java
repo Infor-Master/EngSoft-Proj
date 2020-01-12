@@ -91,14 +91,21 @@ public class ComponenteService {
         return Optional.empty();
     }
 
-    //tem um bug, adiciona um novo objeto a base de dados em vez de o substituir
     public Optional<Componente> updateComponente(String cadeira, int ano, String type, Componente componente){
         Optional<Componente> optionalComponente = findByType(cadeira,ano,type);
         if(optionalComponente.isPresent()){
-            componenteRepo.save(componente);
+            return update(optionalComponente.get(),componente);
 
         }
         return optionalComponente;
+    }
+
+    public Optional<Componente> update(Componente old, Componente newComp){
+        if (newComp.getType() != null && old.getType().compareTo(newComp.getType()) != 0){
+            old.setType(newComp.getType());
+        }
+        componenteRepo.save(old);
+        return Optional.of(old);
     }
 
 

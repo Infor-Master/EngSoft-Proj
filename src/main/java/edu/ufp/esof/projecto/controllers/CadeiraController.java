@@ -40,7 +40,7 @@ public class CadeiraController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<Iterable<Cadeira>> getAllAlunos(){
+    public ResponseEntity<Iterable<Cadeira>> getAllCadeiras(){
         this.logger.info("Listing Request for cadeiras");
 
         return ResponseEntity.ok(this.cadeiraService.findAll());

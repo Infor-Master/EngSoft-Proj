@@ -1,5 +1,6 @@
 package edu.ufp.esof.projecto.services;
 
+import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.models.Docente;
 import edu.ufp.esof.projecto.repositories.DocenteRepo;
 import edu.ufp.esof.projecto.services.filters.Docente.FilterDocenteObject;
@@ -73,13 +74,24 @@ public class DocenteService {
     public Boolean deleteDocente(String code){
         Optional<Docente> optionalDocente=this.docenteRepo.findByCode(code);
         if(optionalDocente.isPresent()){
-            docenteRepo.delete(optionalDocente.get());
+            delete(optionalDocente.get());
+            //docenteRepo.delete(optionalDocente.get());
             return true;
         }
         return false;
     }
 
     public void deleteAll(){
-        docenteRepo.deleteAll();
+        for (Docente d : docenteRepo.findAll()) {
+            delete(d);
+        }
+    }
+
+    public void delete(Docente d){
+        for (Componente c : d.getComponentes()) {
+            c.setDocente(null);
+            d.getComponentes().remove(c);
+        }
+        docenteRepo.delete(d);
     }
 }

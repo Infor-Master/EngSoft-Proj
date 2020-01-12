@@ -21,13 +21,15 @@ public class OfertaService {
     private CadeiraRepo cadeiraRepo;
     private FilterOfertaService filterService;
     private ComponenteService componenteService;
+    private ResultadoAprendizagemService resultadoAprendizagemService;
 
     @Autowired
-    public OfertaService(OfertaRepo ofertaRepo, CadeiraRepo cadeiraRepo, FilterOfertaService filterService, ComponenteService componenteService) {
+    public OfertaService(OfertaRepo ofertaRepo, CadeiraRepo cadeiraRepo, FilterOfertaService filterService, ComponenteService componenteService, ResultadoAprendizagemService resultadoAprendizagemService) {
         this.ofertaRepo = ofertaRepo;
         this.cadeiraRepo = cadeiraRepo;
         this.filterService = filterService;
         this.componenteService = componenteService;
+        this.resultadoAprendizagemService = resultadoAprendizagemService;
     }
 
     public Set<Oferta> filterOferta(Map<String, String> searchParams){
@@ -129,7 +131,7 @@ public class OfertaService {
             componenteService.delete(c);
         }
         for (ResultadoAprendizagem ra : o.getRas()){
-            //delete ra
+            resultadoAprendizagemService.delete(ra);
         }
         ofertaRepo.delete(o);
     }

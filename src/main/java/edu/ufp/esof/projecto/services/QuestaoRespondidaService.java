@@ -13,11 +13,13 @@ import java.util.Set;
 public class QuestaoRespondidaService {
 
     private QuestaoRespondidaRepo questaoRespondidaRepo;
+    private CriterioService criterioService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public QuestaoRespondidaService(QuestaoRespondidaRepo questaoRespondidaRepo) {
+    public QuestaoRespondidaService(QuestaoRespondidaRepo questaoRespondidaRepo, CriterioService criterioService) {
         this.questaoRespondidaRepo = questaoRespondidaRepo;
+        this.criterioService = criterioService;
     }
 
     public Set<QuestaoRespondida> findAll(){
@@ -63,9 +65,22 @@ public class QuestaoRespondidaService {
     public Boolean deleteQuestaoRespondida(Long id){
         Optional<QuestaoRespondida> optionalQuestaoRespondida=this.questaoRespondidaRepo.findById(id);
         if(optionalQuestaoRespondida.isPresent()){
-            questaoRespondidaRepo.delete(optionalQuestaoRespondida.get());
+            delete(optionalQuestaoRespondida.get());
+            //questaoRespondidaRepo.delete(optionalQuestaoRespondida.get());
             return true;
         }
         return false;
+    }
+
+    public void delete(QuestaoRespondida qr){
+        if (qr.getMomento() != null){
+            qr.getMomento().getQuestoes().remove(qr);
+            qr.setMomento(null);
+        }
+        if (qr.getCriterio() != null){
+            criterioService.delete(qr.getCriterio());
+            qr.setCriterio(null);
+        }
+        questaoRespondidaRepo.delete(qr);
     }
 }

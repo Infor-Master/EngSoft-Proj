@@ -1,6 +1,7 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Cadeira;
+import edu.ufp.esof.projecto.models.Criterio;
 import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.services.filters.Cadeira.FilterCadeiraObject;
@@ -18,12 +19,16 @@ public class CadeiraService {
 
     private CadeiraRepo cadeiraRepo;
     private FilterCadeiraService filterService;
+    private OfertaService ofertaService;
+    private CriterioService criterioService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public CadeiraService(CadeiraRepo cadeiraRepo, FilterCadeiraService filterService) {
+    public CadeiraService(CadeiraRepo cadeiraRepo, FilterCadeiraService filterService, OfertaService ofertaService, CriterioService criterioService) {
         this.cadeiraRepo = cadeiraRepo;
         this.filterService=filterService;
+        this.ofertaService = ofertaService;
+        this.criterioService = criterioService;
     }
 
     public Set<Cadeira> filterCadeira(Map<String, String> searchParams){
@@ -83,14 +88,26 @@ public class CadeiraService {
     public Boolean deleteCadeira(String code){
         Optional<Cadeira> optionalCadeira=this.cadeiraRepo.findByCode(code);
         if(optionalCadeira.isPresent()){
-            cadeiraRepo.delete(optionalCadeira.get());
+            delete(optionalCadeira.get());
             return true;
         }
         return false;
     }
 
     public void deleteAll(){
-        cadeiraRepo.deleteAll();
+        for (Cadeira c : cadeiraRepo.findAll()) {
+            delete(c);
+        }
     }
 
+    public void delete(Cadeira c){
+        for (Oferta o : c.getOfertas()) {
+            ofertaService.delete(o);
+        }
+        for (Criterio cr : c.getCriterios()) {
+            criterioService.delete(cr);
+            c.getCriterios().remove(cr); // verificar
+        }
+        cadeiraRepo.delete(c);
+    }
 }

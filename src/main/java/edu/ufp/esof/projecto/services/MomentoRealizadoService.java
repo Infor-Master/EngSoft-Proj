@@ -68,4 +68,15 @@ public class MomentoRealizadoService {
         }
         return false;
     }
+
+    public void delete(MomentoRealizado mr){
+        if (mr.getAluno() != null){
+            mr.getAluno().getMomentos().remove(mr);
+            mr.setAluno(null);
+        }
+        for (QuestaoRespondida qr : mr.getQuestoes()) {
+            questaoRespondidaService.delete(qr);
+        }
+        momentoRealizadoRepo.delete(mr);
+    }
 }

@@ -100,4 +100,8 @@ public class CriterioService {
             }
         }
     }
+
+    public void delete(Criterio c){
+        criterioRepo.delete(c);
+    }
 }

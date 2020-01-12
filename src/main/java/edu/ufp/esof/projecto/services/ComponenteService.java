@@ -19,13 +19,17 @@ public class ComponenteService {
     private ComponenteRepo componenteRepo;
     private CadeiraRepo cadeiraRepo;
     private CadeiraService cadeiraService;
+    private MomentoService momentoService;
+    private OfertaService ofertaService;
     private FilterComponenteService filterService;
 
     @Autowired
-    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, CadeiraService cadeiraService, FilterComponenteService filterService) {
+    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, CadeiraService cadeiraService, MomentoService momentoService, OfertaService ofertaService, FilterComponenteService filterService) {
         this.componenteRepo = componenteRepo;
         this.cadeiraRepo = cadeiraRepo;
         this.cadeiraService = cadeiraService;
+        this.momentoService = momentoService;
+        this.ofertaService = ofertaService;
         this.filterService = filterService;
     }
 
@@ -146,15 +150,15 @@ public class ComponenteService {
         }
         for (Aluno a : c.getAlunos()) {
             a.getComponentes().remove(c);
+            c.getAlunos().remove(a);
         }
-        c.setAlunos(null);
         for (Momento m : c.getMomentos()) {
-            //delete momento
+            momentoService.delete(m);
         }
-        c.setMomentos(null);
         if (c.getOferta() != null){
-            c.getOferta().getComponentes().remove(c);
-            c.setOferta(null);
+            /*c.getOferta().getComponentes().remove(c);
+            c.setOferta(null);*/
+            ofertaService.delete(c.getOferta());
         }
         componenteRepo.delete(c);
     }

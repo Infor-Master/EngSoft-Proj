@@ -16,11 +16,13 @@ public class QuestaoService {
 
     private QuestaoRepo questaoRepo;
     private QuestaoRespondidaRepo questaoRespondidaRepo;
+    private QuestaoRespondidaService questaoRespondidaService;
 
     @Autowired
-    public QuestaoService(QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo) {
+    public QuestaoService(QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, QuestaoRespondidaService questaoRespondidaService) {
         this.questaoRepo = questaoRepo;
         this.questaoRespondidaRepo = questaoRespondidaRepo;
+        this.questaoRespondidaService = questaoRespondidaService;
     }
 
     public Set<Questao> findAll(){
@@ -72,6 +74,7 @@ public class QuestaoService {
         return Optional.empty();
     }
 
+    // falta fazer
     /**
      * Apaga todas as questoes respondidas associadas a uma questão até se apagar a si
      * @param designation designação da questao a apagar
@@ -89,9 +92,28 @@ public class QuestaoService {
         return false;
     }
 
+    // falta fazer
     public void deleteAll(){
         for (Questao q:this.questaoRepo.findAll()) {
             deleteQuestao(q.getDesignation());
         }
+    }
+
+    public void delete(Questao q){
+        if (q.getMomento() != null){
+            q.getMomento().getQuestoes().remove(q);
+            q.setMomento(null);
+        }
+        if (q.getRa() != null){
+            q.getRa().getQuestoes().remove(q);
+            q.setRa(null);
+        }
+        Optional<Iterable<QuestaoRespondida>> optionalQuestaoRespondidas = questaoRespondidaRepo.findAllByQuestao(q);
+        if (optionalQuestaoRespondidas.isPresent()){
+            for (QuestaoRespondida qr : optionalQuestaoRespondidas.get()) {
+                questaoRespondidaService.delete(qr);
+            }
+        }
+        questaoRepo.delete(q);
     }
 }

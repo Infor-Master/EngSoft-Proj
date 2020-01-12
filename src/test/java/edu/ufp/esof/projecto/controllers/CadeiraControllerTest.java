@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashSet;
@@ -105,11 +106,43 @@ class CadeiraControllerTest {
     }
 
     @Test
-    void editCadeira() {
+    void editCadeira() throws Exception {
+        Cadeira cadeira=new Cadeira("cadeira1", "123");
+        Cadeira cadeira2=new Cadeira("cadeira1", "222");
+        when(this.cadeiraService.updateCadeira("cadeira1", cadeira2)).thenReturn(Optional.of(cadeira2));
+        String jsonRequest=this.objectMapper.writeValueAsString(cadeira2);
+        this.mockMvc.perform(
+                put("/cadeira/cadeira1").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding("UTF-8")
+                        .content(jsonRequest)
+        ).andExpect(status().isOk());
+
+        this.mockMvc.perform(
+                put("/cadeira/cadeiraWRONG").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding("UTF-8")
+                        .content(jsonRequest)
+        ).andExpect(status().isNotFound());
     }
 
     @Test
-    void createCadeira() {
+    void createCadeira() throws Exception{
+        Cadeira cadeira=new Cadeira("Teste", "123");
+        when(cadeiraService.createCadeira(cadeira)).thenReturn(Optional.of(cadeira));
+        String jsonRequest=this.objectMapper.writeValueAsString(cadeira);
+
+        this.mockMvc.perform(
+                post("/cadeira").contentType(MediaType.APPLICATION_JSON).content(jsonRequest)
+        ).andExpect(status().isOk());
+
+        Cadeira BADcadeira=new Cadeira("TesteBAD", "321");
+        when(this.cadeiraService.createCadeira(BADcadeira)).thenReturn(Optional.empty());
+        String BADjsonRequest=this.objectMapper.writeValueAsString(BADcadeira);
+
+        this.mockMvc.perform(
+                post("/cadeira").contentType(MediaType.APPLICATION_JSON).content(BADjsonRequest)
+        ).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -123,7 +156,7 @@ class CadeiraControllerTest {
         componentes.add(componente1);
         componentes.add(componente2);
         componentes.add(componente3);
-        when(this.componenteService.findAll()).thenReturn(componentes);
+        when(this.componenteService.findAll("Teste", 2020)).thenReturn(componentes);
         String responseJson=this.mockMvc.perform(
                 get("/cadeira/Teste/2020/componentes")
         ).andExpect(
@@ -150,25 +183,18 @@ class CadeiraControllerTest {
         Oferta oferta=new Oferta(2020,cadeira);
         Componente componente1=new Componente("componente1", oferta);
         Componente componente2=new Componente("componente2", oferta);
-        Componente componente3=new Componente("componente3", oferta);
         componente1.setType("TP");
         componente2.setType("PL");
-        componente3.setType("PL");
-        Set<Componente> componentesPL=new HashSet<>();
-        componentesPL.add(componente2);
-        componentesPL.add(componente3);
-        Set<Componente> componentesTP=new HashSet<>();
-        componentesTP.add(componente1);
 
 
-        when(this.componenteService.findByType("Teste",2020, "PL")).thenReturn(componentesPL);
+        when(this.componenteService.findByType("Teste",2020, "PL")).thenReturn(Optional.of(componente1));
         String responseJson=this.mockMvc.perform(
                 get("/cadeira/Teste/2020/PL")
         ).andExpect(
                 status().isOk()
         ).andReturn().getResponse().getContentAsString();
 
-        when(this.componenteService.findByType("Teste",2020, "TP")).thenReturn(componentesTP);
+        when(this.componenteService.findByType("Teste",2020, "TP")).thenReturn(Optional.of(componente2));
         responseJson=this.mockMvc.perform(
                 get("/cadeira/Teste/2020/TP")
         ).andExpect(
@@ -186,11 +212,47 @@ class CadeiraControllerTest {
     }
 
     @Test
-    void editComponente() {
+    void editComponente() throws Exception {
+        Cadeira cadeira=new Cadeira("Teste","123");
+        Oferta oferta=new Oferta(2020,cadeira);
+        Componente componente=new Componente("PL", oferta);
+        Componente componente2=new Componente("TP", oferta);
+        when(this.componenteService.updateComponente("Teste",2020,"PL", componente2)).thenReturn(Optional.of(componente2));
+        String jsonRequest=this.objectMapper.writeValueAsString(componente2);
+        this.mockMvc.perform(
+                put("/cadeira/Teste/2020/PL").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding("UTF-8")
+                        .content(jsonRequest)
+        ).andExpect(status().isOk());
+
+        this.mockMvc.perform(
+                put("/cadeira/Teste/2020/LAB").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding("UTF-8")
+                        .content(jsonRequest)
+        ).andExpect(status().isNotFound());
     }
 
     @Test
-    void createComponente() {
+    void createComponente() throws Exception {
+        Cadeira cadeira=new Cadeira("Teste","123");
+        Oferta oferta=new Oferta(2020, cadeira);
+        Componente componente=new Componente("PL", oferta);
+        when(componenteService.createComponente("Teste",2020, componente)).thenReturn(Optional.of(componente));
+        String jsonRequest=this.objectMapper.writeValueAsString(componente);
+
+        this.mockMvc.perform(
+                post("/cadeira/Teste/2020").contentType(MediaType.APPLICATION_JSON).content(jsonRequest)
+        ).andExpect(status().isOk());
+
+        Componente BADcomponente=new Componente("TP", oferta);
+        when(componenteService.createComponente("Teste", 2020, BADcomponente)).thenReturn(Optional.empty());
+        String BADjsonRequest=this.objectMapper.writeValueAsString(BADcomponente);
+
+        this.mockMvc.perform(
+                post("/cadeira/Teste/2020").contentType(MediaType.APPLICATION_JSON).content(BADjsonRequest)
+        ).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -225,15 +287,64 @@ class CadeiraControllerTest {
     }
 
     @Test
-    void getCriterio() {
+    void getCriterio() throws Exception {
+        Cadeira cadeira=new Cadeira("Teste","123");
+        Criterio criterio=new Criterio("bom", 10F);
+        when(this.criterioService.findByDesignation("Teste", "bom")).thenReturn(Optional.of(criterio));
+        String responseJson=this.mockMvc.perform(
+                get("/cadeira/Teste/criterios/bom")
+        ).andExpect(
+                status().isOk()
+        ).andReturn().getResponse().getContentAsString();
+
+        this.mockMvc.perform(
+                get("/cadeira/Teste/criterios/mau")
+        ).andExpect(
+                status().isNotFound()
+        );
     }
 
     @Test
-    void editCriterio() {
+    void editCriterio() throws Exception {
+        Cadeira cadeira=new Cadeira("Teste","123");
+        Criterio criterio=new Criterio("bom", 10F);
+        Criterio criterio2=new Criterio("bom", 15F);
+
+        when(this.criterioService.updateCriterio("Teste","bom", criterio2)).thenReturn(Optional.of(criterio2));
+        String jsonRequest=this.objectMapper.writeValueAsString(criterio2);
+        this.mockMvc.perform(
+                put("/cadeira/Teste/criterios/bom").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding("UTF-8")
+                        .content(jsonRequest)
+        ).andExpect(status().isOk());
+
+        this.mockMvc.perform(
+                put("/cadeira/Teste/criterios/mau").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding("UTF-8")
+                        .content(jsonRequest)
+        ).andExpect(status().isNotFound());
     }
 
     @Test
-    void createCriterio() {
+    void createCriterio() throws Exception {
+        Cadeira cadeira=new Cadeira("Teste","123");
+        Criterio criterio=new Criterio("bom", 10F);
+        when(criterioService.createCriterio("Teste", criterio)).thenReturn(Optional.of(criterio));
+        String jsonRequest=this.objectMapper.writeValueAsString(criterio);
+
+        this.mockMvc.perform(
+                post("/cadeira/Teste/criterios").contentType(MediaType.APPLICATION_JSON).content(jsonRequest)
+        ).andExpect(status().isOk());
+
+        Criterio BADcriterio=new Criterio("bom", 99F);
+        when(criterioService.createCriterio("Teste", BADcriterio)).thenReturn(Optional.empty());
+        String BADjsonRequest=this.objectMapper.writeValueAsString(BADcriterio);
+
+        this.mockMvc.perform(
+                post("/cadeira/Teste/criterios").contentType(MediaType.APPLICATION_JSON).content(BADjsonRequest)
+        ).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -268,10 +379,63 @@ class CadeiraControllerTest {
     }
 
     @Test
-    void getOfertaById() {
+    void getOfertaById() throws Exception {
+        Cadeira cadeira=new Cadeira("Teste","123");
+        Oferta oferta=new Oferta(2020,cadeira);
+        when(this.ofertaService.find("Teste", 2020)).thenReturn(Optional.of(oferta));
+        String responseJson=this.mockMvc.perform(
+                get("/cadeira/Teste/2020")
+        ).andExpect(
+                status().isOk()
+        ).andReturn().getResponse().getContentAsString();
+
+        this.mockMvc.perform(
+                get("/cadeira/Teste/2099")
+        ).andExpect(
+                status().isNotFound()
+        );
     }
 
     @Test
-    void editOferta() {
+    void editOferta() throws Exception {
+        Cadeira cadeira=new Cadeira("Teste","123");
+        Oferta oferta1=new Oferta(2020,cadeira);
+        Oferta oferta2=new Oferta(2019,cadeira);
+
+        when(this.ofertaService.updateOferta("Teste",2020, oferta2)).thenReturn(Optional.of(oferta2));
+        String jsonRequest=this.objectMapper.writeValueAsString(oferta2);
+        this.mockMvc.perform(
+                put("/cadeira/Teste/2020").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding("UTF-8")
+                        .content(jsonRequest)
+        ).andExpect(status().isOk());
+
+        this.mockMvc.perform(
+                put("/cadeira/Teste/2099").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding("UTF-8")
+                        .content(jsonRequest)
+        ).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createOferta() throws Exception{
+        Cadeira cadeira=new Cadeira("Teste","123");
+        Oferta oferta=new Oferta(2020, cadeira);
+        when(ofertaService.createOferta("Teste", oferta)).thenReturn(Optional.of(oferta));
+        String jsonRequest=this.objectMapper.writeValueAsString(oferta);
+
+        this.mockMvc.perform(
+                post("/cadeira/Teste/ofertas").contentType(MediaType.APPLICATION_JSON).content(jsonRequest)
+        ).andExpect(status().isOk());
+
+        Oferta BADoferta=new Oferta(2099, cadeira);
+        when(ofertaService.createOferta("Teste", BADoferta)).thenReturn(Optional.empty());
+        String BADjsonRequest=this.objectMapper.writeValueAsString(BADoferta);
+
+        this.mockMvc.perform(
+                post("/cadeira/Teste/ofertas").contentType(MediaType.APPLICATION_JSON).content(BADjsonRequest)
+        ).andExpect(status().isBadRequest());
     }
 }

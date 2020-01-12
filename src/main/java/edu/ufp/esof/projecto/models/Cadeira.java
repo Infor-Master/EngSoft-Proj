@@ -29,8 +29,8 @@ public class Cadeira {
     private String code;
 
     @OneToMany(cascade = CascadeType.PERSIST)
-    @JsonIgnore
     //@JsonManagedReference
+    @JsonIgnore
     private Set<Oferta> ofertas = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.PERSIST)

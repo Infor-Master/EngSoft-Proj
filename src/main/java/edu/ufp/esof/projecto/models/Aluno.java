@@ -2,7 +2,6 @@ package edu.ufp.esof.projecto.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -47,4 +46,13 @@ public class Aluno {
         this.setName(name);
         this.setCode(code);
     }
+
+    public void changeName(String name){
+        this.setName(name);
+    }
+
+    public void changeCode(String code){
+        this.setCode(code);
+    }
+
 }

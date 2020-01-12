@@ -1,6 +1,5 @@
 package edu.ufp.esof.projecto.services.filters.Componente;
 
-import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.services.filters.FilterI;
 

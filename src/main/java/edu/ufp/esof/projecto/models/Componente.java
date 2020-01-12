@@ -54,6 +54,10 @@ public class Componente {
         oferta.getComponentes().add(this);
     }
 
+    public void changeType(String type){
+        setType(type);
+    }
+
     public void addDocente(Docente d){
         if (docente == null){
             docente = d;

@@ -53,23 +53,10 @@ public class QuestaoRespondidaService {
         return Optional.empty();
     }
 
-    /*public Optional<QuestaoRespondida> createQuestaoRespondida(QuestaoRespondida questaoRespondida){
-        Optional<QuestaoRespondida> optionalQuestaoRespondida=this.questaoRespondidaRepo.findById(questaoRespondida.getId());
-        if(optionalQuestaoRespondida.isPresent()){
-            return Optional.empty();
-        }
-        QuestaoRespondida createdQuestaoRespondida=this.questaoRespondidaRepo.save(questaoRespondida);
-        return Optional.of(createdQuestaoRespondida);
-    }*/
-
-    /**
-     *  Boolean não usado ainda mas poderá ser necessário
-     */
     public Boolean deleteQuestaoRespondida(Long id){
         Optional<QuestaoRespondida> optionalQuestaoRespondida=this.questaoRespondidaRepo.findById(id);
         if(optionalQuestaoRespondida.isPresent()){
             delete(optionalQuestaoRespondida.get());
-            //questaoRespondidaRepo.delete(optionalQuestaoRespondida.get());
             return true;
         }
         return false;

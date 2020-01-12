@@ -18,7 +18,6 @@ public class CadeiraService {
     private FilterCadeiraService filterService;
     private OfertaService ofertaService;
     private CriterioService criterioService;
-    // Falta o Filtro do serviço e no constructor
 
     @Autowired
     public CadeiraService(CadeiraRepo cadeiraRepo, FilterCadeiraService filterService, OfertaService ofertaService, CriterioService criterioService) {

@@ -6,7 +6,6 @@ import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.models.ResultadoAprendizagem;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.OfertaRepo;
-import edu.ufp.esof.projecto.services.filters.Cadeira.FilterCadeiraObject;
 import edu.ufp.esof.projecto.services.filters.Oferta.FilterOfertaObject;
 import edu.ufp.esof.projecto.services.filters.Oferta.FilterOfertaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,7 @@ public class OfertaService {
         return Optional.empty();
     }
 
-    //verificar
+    //Esta mal
     public Optional<Oferta> updateOferta(String cadeira, int ano, Oferta oferta){
         Optional<Oferta> optionalOferta = find(cadeira,ano);
         if (optionalOferta.isPresent()){
@@ -99,9 +98,6 @@ public class OfertaService {
             for (Oferta o : optionalCadeira.get().getOfertas()) {
                 if (o.getAno() == ano){
                     delete(o);
-                    //optionalCadeira.get().getOfertas().remove(o);
-                    //o.setCadeira(null);
-                    //ofertaRepo.delete(o);
                     return true;
                 }
             }
@@ -109,16 +105,12 @@ public class OfertaService {
         return false;
     }
 
-    //acabar
     public void deleteAll(String cadeira){
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if (optionalCadeira.isPresent()){
             while(!optionalCadeira.get().getOfertas().isEmpty()){
                 Iterator<Oferta> ofertas = optionalCadeira.get().getOfertas().iterator();
                 Oferta o = ofertas.next();
-                //optionalCadeira.get().getOfertas().remove(o);
-                //o.setCadeira(null);
-                //ofertaRepo.delete(o);
                 delete(o);
             }
         }
@@ -139,13 +131,6 @@ public class OfertaService {
             ResultadoAprendizagem ra = ras.next();
             resultadoAprendizagemService.delete(ra);
         }
-        /*
-        for (Componente c : o.getComponentes()) {
-            componenteService.delete(c);
-        }
-        for (ResultadoAprendizagem ra : o.getRas()){
-            resultadoAprendizagemService.delete(ra);
-        }*/
         ofertaRepo.delete(o);
     }
 }

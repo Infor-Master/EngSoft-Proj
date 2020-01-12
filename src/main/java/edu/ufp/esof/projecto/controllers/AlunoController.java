@@ -3,7 +3,6 @@ package edu.ufp.esof.projecto.controllers;
 import edu.ufp.esof.projecto.models.Aluno;
 import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.services.AlunoService;
-import edu.ufp.esof.projecto.services.CadeiraService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

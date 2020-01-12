@@ -3,7 +3,6 @@ package edu.ufp.esof.projecto.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,6 +41,14 @@ public class Cadeira {
         this.setCode(code);
     }
 
+    public void changeDesignation(String designation){
+        setDesignation(designation);
+    }
+
+    public void changeCode(String code){
+        setCode(code);
+    }
+
     public void addOferta(Oferta offer){
         if (addCheckOferta(offer))
             ofertas.add(offer);
@@ -49,7 +56,7 @@ public class Cadeira {
 
     public Oferta removeOferta(int id){
         for (Oferta o : ofertas) {
-            if (o.getId() == id){
+            if (o.getId().equals(id)){
                 ofertas.remove(o);
                 return o;
             }

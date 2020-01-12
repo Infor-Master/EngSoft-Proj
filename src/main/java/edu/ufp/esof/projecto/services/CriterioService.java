@@ -5,7 +5,6 @@ import edu.ufp.esof.projecto.models.Criterio;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.CriterioRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -18,7 +17,6 @@ public class CriterioService {
 
     private CriterioRepo criterioRepo;
     private CadeiraRepo cadeiraRepo;
-    //private CadeiraService cadeiraService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired

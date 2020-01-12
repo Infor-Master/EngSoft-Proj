@@ -9,8 +9,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
-
 @Component
 //@Transactional
 public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {

@@ -59,18 +59,6 @@ public class QuestaoService {
         return questoesRespondidas;
     }
 
-
-
-
-    /*public Optional<Questao> updateQuestao(String designation, Questao questao){
-        Optional<Questao> optionalQuestao=this.questaoRepo.findByDesignation(designation);
-        if(optionalQuestao.isPresent()){
-            questaoRepo.save(questao);
-            return optionalQuestao;
-        }
-        return Optional.empty();
-    }*/
-
     // falta fazer
     public Boolean deleteQuestao(String did, String cadeira, int ano, String comp, String momento, String designation){
         Optional<Componente> optionalComponente = findComponentByType(cadeira,ano,comp);
@@ -91,13 +79,6 @@ public class QuestaoService {
         }
         return false;
     }
-
-    // falta fazer
-    /*public void deleteAll(){
-        for (Questao q:this.questaoRepo.findAll()) {
-            deleteQuestao(q.getDesignation());
-        }
-    }*/
 
     public void delete(Questao q){
         if (q.getMomento() != null){

@@ -9,10 +9,7 @@ import edu.ufp.esof.projecto.services.filters.Cadeira.FilterCadeiraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CadeiraService {
@@ -101,12 +98,16 @@ public class CadeiraService {
     }
 
     public void delete(Cadeira c){
-        for (Oferta o : c.getOfertas()) {
+        while(!c.getOfertas().isEmpty()){
+            Iterator<Oferta> ofertas = c.getOfertas().iterator();
+            Oferta o = ofertas.next();
             ofertaService.delete(o);
         }
-        for (Criterio cr : c.getCriterios()) {
+        while(!c.getCriterios().isEmpty()){
+            Iterator<Criterio> criterios = c.getCriterios().iterator();
+            Criterio cr = criterios.next();
+            c.getCriterios().remove(cr);
             criterioService.delete(cr);
-            c.getCriterios().remove(cr); // verificar
         }
         cadeiraRepo.delete(c);
     }

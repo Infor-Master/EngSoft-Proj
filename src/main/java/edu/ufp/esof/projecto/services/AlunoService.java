@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -82,13 +83,25 @@ public class AlunoService {
     }
 
     public void delete(Aluno a){
+        /*while(!a.getComponentes().isEmpty()){
+            Iterator<Componente> componentes = a.getComponentes().iterator();
+            Componente c = componentes.next();
+            c.getAlunos().remove(a);
+            a.getComponentes().remove(c);
+        }*/
         for (Componente c : a.getComponentes()) {
             c.getAlunos().remove(a);
             a.getComponentes().remove(c);
         }
-        for (MomentoRealizado mr : a.getMomentos()) {
+        while(!a.getMomentos().isEmpty()){
+            Iterator<MomentoRealizado> momentos = a.getMomentos().iterator();
+            MomentoRealizado mr = momentos.next();
             momentoRealizadoService.delete(mr);
         }
+        /*
+        for (MomentoRealizado mr : a.getMomentos()) {
+            momentoRealizadoService.delete(mr);
+        }*/
         alunoRepo.delete(a);
     }
 }

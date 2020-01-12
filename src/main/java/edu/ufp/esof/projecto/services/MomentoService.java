@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -111,9 +112,15 @@ public class MomentoService {
             m.getComponente().getMomentos().remove(m);
             m.setComponente(null);
         }
-        for (Questao q : m.getQuestoes()) {
+        while(!m.getQuestoes().isEmpty()){
+            Iterator<Questao> questoes = m.getQuestoes().iterator();
+            Questao q = questoes.next();
             questaoService.delete(q);
         }
+        /*
+        for (Questao q : m.getQuestoes()) {
+            questaoService.delete(q);
+        }*/
         Optional<Iterable<MomentoRealizado>> optionalMomentoRealizado =momentoRealizadoRepo.findAllByMomento(m);
         if (optionalMomentoRealizado.isPresent()){
             for (MomentoRealizado mr : optionalMomentoRealizado.get()) {

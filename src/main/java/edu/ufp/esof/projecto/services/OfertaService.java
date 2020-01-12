@@ -125,14 +125,27 @@ public class OfertaService {
     }
 
     public void delete(Oferta o){
-        o.getCadeira().getOfertas().remove(o);
-        o.setCadeira(null);
+        if (o.getCadeira() != null){
+            o.getCadeira().getOfertas().remove(o);
+            o.setCadeira(null);
+        }
+        while(!o.getComponentes().isEmpty()){
+            Iterator<Componente> componentez = o.getComponentes().iterator();
+            Componente c = componentez.next();
+            componenteService.delete(c);
+        }
+        while(!o.getRas().isEmpty()){
+            Iterator<ResultadoAprendizagem> ras = o.getRas().iterator();
+            ResultadoAprendizagem ra = ras.next();
+            resultadoAprendizagemService.delete(ra);
+        }
+        /*
         for (Componente c : o.getComponentes()) {
             componenteService.delete(c);
         }
         for (ResultadoAprendizagem ra : o.getRas()){
             resultadoAprendizagemService.delete(ra);
-        }
+        }*/
         ofertaRepo.delete(o);
     }
 }

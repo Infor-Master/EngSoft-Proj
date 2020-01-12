@@ -2,6 +2,7 @@ package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Aluno;
 import edu.ufp.esof.projecto.models.Componente;
+import edu.ufp.esof.projecto.models.Criterio;
 import edu.ufp.esof.projecto.models.MomentoRealizado;
 import edu.ufp.esof.projecto.repositories.AlunoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,14 @@ public class AlunoService {
 
     private AlunoRepo alunoRepo;
     private MomentoRealizadoService momentoRealizadoService;
+    private ComponenteService componenteService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public AlunoService(AlunoRepo alunoRepo, MomentoRealizadoService momentoRealizadoService) {
+    public AlunoService(AlunoRepo alunoRepo, MomentoRealizadoService momentoRealizadoService, ComponenteService componenteService) {
         this.momentoRealizadoService = momentoRealizadoService;
         this.alunoRepo = alunoRepo;
+        this.componenteService = componenteService;
     }
 
     public Set<Aluno> findAll() {
@@ -126,6 +129,82 @@ public class AlunoService {
                 componentes.add(c);
             }
             return Optional.of(componentes);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Criterio> notasRaCadeira(String id, String cadeira, int ano, String componente){
+        Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
+        Optional<Componente> optionalComponente = componenteService.findByType(cadeira,ano,componente);
+        if (optionalAluno.isPresent() && optionalComponente.isPresent() && optionalComponente.get().getAlunos().contains(optionalAluno.get())){
+            Set<Criterio> notas = new HashSet<>();
+            for (Aluno a : optionalComponente.get().getAlunos()) {
+                if (a.getId() == optionalAluno.get().getId()){
+                    for (MomentoRealizado mr : a.getMomentos()) {
+                        if (mr.getMomento().getComponente().getId() == optionalComponente.get().getId()){
+                            Criterio cr = new Criterio(mr.getMomento().getComponente().getOferta().getCadeira().getDesignation() + " - " + mr.getMomento().getDesignation(), 0.0f);
+                            cr.setNota(mr.notaRa());
+                            return Optional.of(cr);
+                        }
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Set<Criterio>> notasRa(String id){
+        Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
+        if (optionalAluno.isPresent()){
+            Set<Criterio> notas = new HashSet<>();
+            for (Componente c : optionalAluno.get().getComponentes()) {
+                Optional<Criterio> optionalCriterio = notasRaCadeira(id,
+                        c.getOferta().getCadeira().getDesignation(),
+                        c.getOferta().getAno(),
+                        c.getType());
+                if (optionalCriterio.isPresent()){
+                    notas.add(optionalCriterio.get());
+                }
+            }
+            return Optional.of(notas);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Criterio> notasCadeira(String id, String cadeira, int ano, String componente){
+        Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
+        Optional<Componente> optionalComponente = componenteService.findByType(cadeira,ano,componente);
+        if (optionalAluno.isPresent() && optionalComponente.isPresent() && optionalComponente.get().getAlunos().contains(optionalAluno.get())){
+            Set<Criterio> notas = new HashSet<>();
+            for (Aluno a : optionalComponente.get().getAlunos()) {
+                if (a.getId() == optionalAluno.get().getId()){
+                    for (MomentoRealizado mr : a.getMomentos()) {
+                        if (mr.getMomento().getComponente().getId() == optionalComponente.get().getId()){
+                            Criterio cr = new Criterio(mr.getMomento().getComponente().getOferta().getCadeira().getDesignation() + " - " + mr.getMomento().getDesignation(), 0.0f);
+                            cr.setNota(mr.nota());
+                            return Optional.of(cr);
+                        }
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Set<Criterio>> notas(String id){
+        Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
+        if (optionalAluno.isPresent()){
+            Set<Criterio> notas = new HashSet<>();
+            for (Componente c : optionalAluno.get().getComponentes()) {
+                Optional<Criterio> optionalCriterio = notasCadeira(id,
+                        c.getOferta().getCadeira().getDesignation(),
+                        c.getOferta().getAno(),
+                        c.getType());
+                if (optionalCriterio.isPresent()){
+                    notas.add(optionalCriterio.get());
+                }
+            }
+            return Optional.of(notas);
         }
         return Optional.empty();
     }

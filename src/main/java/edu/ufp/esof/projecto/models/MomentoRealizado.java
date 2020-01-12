@@ -42,4 +42,20 @@ public class MomentoRealizado {
     public MomentoRealizado(Momento momento){
         this.setMomento(momento);
     }
+
+    public float notaRa(){
+        float nota = 0.0f;
+        for (QuestaoRespondida qr : questoes) {
+            nota += qr.getQuestao().getPesoRA()*qr.getCriterio().getNota();
+        }
+        return nota;
+    }
+
+    public float nota(){
+        float nota = 0.0f;
+        for (QuestaoRespondida qr : questoes) {
+            nota += qr.getQuestao().getPesoMomento()*qr.getCriterio().getNota();
+        }
+        return nota;
+    }
 }

@@ -2,8 +2,10 @@ package edu.ufp.esof.projecto.controllers;
 
 import edu.ufp.esof.projecto.models.Docente;
 import edu.ufp.esof.projecto.models.Momento;
+import edu.ufp.esof.projecto.models.Questao;
 import edu.ufp.esof.projecto.services.DocenteService;
 import edu.ufp.esof.projecto.services.MomentoService;
+import edu.ufp.esof.projecto.services.QuestaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +26,13 @@ public class DocenteController {
 
     private DocenteService docenteService;
     private MomentoService momentoService;
+    private QuestaoService questaoService;
 
     @Autowired
-    public DocenteController(DocenteService docenteService, MomentoService momentoService) {
+    public DocenteController(DocenteService docenteService, MomentoService momentoService, QuestaoService questaoService) {
         this.docenteService = docenteService;
         this.momentoService = momentoService;
+        this.questaoService = questaoService;
     }
 
 
@@ -153,6 +157,7 @@ public class DocenteController {
     }
 
 
+    // Falta verificação se professor dá a cadeira
     @RequestMapping(value = "/{id}/{cadeira}/{ano}/{comp]/momento/{nome}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteMomento(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @PathVariable("nome") String nome) throws NoMomentoException {
         this.logger.info("Delete Request for docente with id " + id);
@@ -164,6 +169,39 @@ public class DocenteController {
         throw new DocenteController.NoDocenteException(id);
     }
 
+
+
+
+    //-------------------------------------------//
+    //              QUESTAO RELATED              //
+    //-------------------------------------------//
+
+
+
+
+    // Falta verificar se professor da a cadeira
+    @PostMapping(value = "/{id}/{cadeira}/{ano}/{comp]/{momento}", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Questao> createQuest(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @PathVariable("momento") String momento, @RequestBody Questao questao){
+        this.logger.info("Create Questao Request");
+
+        Optional<Questao> questaoOptional = this.questaoService.createQuestao(id,cadeira,ano,comp,momento,questao);
+        if(questaoOptional.isPresent()){
+            return ResponseEntity.ok(questaoOptional.get());
+        }
+        throw new QuestaoAlreadyExistsException(questao.getDesignation());
+    }
+
+    // Falta verificação se professor dá a cadeira
+    @RequestMapping(value = "/{id}/{cadeira}/{ano}/{comp]/{momento}/{nome}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteMomento(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @PathVariable("momento") String momento, @PathVariable("nome") String nome) throws NoMomentoException {
+        this.logger.info("Delete Request for questao");
+
+        Boolean deleted = this.questaoService.deleteQuestao(id,cadeira,ano,comp,momento,nome);
+        if(deleted) {
+            return ResponseEntity.ok("Deleted momento " + nome);
+        }
+        throw new NoQuestaoException(nome);
+    }
 
 
 
@@ -203,6 +241,22 @@ public class DocenteController {
     private static class NoMomentoException extends RuntimeException{
         private NoMomentoException(String nome){
             super("Momento " + nome + " não existente");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Questao não existente")
+    private static class NoQuestaoException extends RuntimeException {
+
+        private NoQuestaoException(String designation) {
+            super("Questao com designacao " + designation + " nao existente");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Questao já existente")
+    private static class QuestaoAlreadyExistsException extends RuntimeException {
+
+        public QuestaoAlreadyExistsException(String designation) {
+            super("Questao com designacao: " + designation + " já existe");
         }
     }
 }

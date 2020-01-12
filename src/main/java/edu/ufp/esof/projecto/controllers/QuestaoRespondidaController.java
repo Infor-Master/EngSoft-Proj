@@ -53,7 +53,7 @@ public class QuestaoRespondidaController {
         throw new QuestaoRespondidaController.NoQuestaoRespondidaException(id);
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    /*@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<QuestaoRespondida> createQuestaoRespondida(@RequestBody QuestaoRespondida questaoRespondida){
         this.logger.info("Create QuestaoRespondida Request with id = " + questaoRespondida.getId());
 
@@ -62,7 +62,7 @@ public class QuestaoRespondidaController {
             return ResponseEntity.ok(optionalQuestaoRespondida.get());
         }
         throw new QuestaoRespondidaController.QuestaoRespondidaAlreadyExistsException(questaoRespondida.getId());
-    }
+    }*/
 
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Questao Respondida não existente")

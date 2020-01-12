@@ -1,7 +1,8 @@
 package edu.ufp.esof.projecto.services;
 
-import edu.ufp.esof.projecto.models.Questao;
-import edu.ufp.esof.projecto.models.QuestaoRespondida;
+import edu.ufp.esof.projecto.models.*;
+import edu.ufp.esof.projecto.repositories.CadeiraRepo;
+import edu.ufp.esof.projecto.repositories.DocenteRepo;
 import edu.ufp.esof.projecto.repositories.QuestaoRespondidaRepo;
 import edu.ufp.esof.projecto.repositories.QuestaoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,17 @@ public class QuestaoService {
 
     private QuestaoRepo questaoRepo;
     private QuestaoRespondidaRepo questaoRespondidaRepo;
+    private DocenteRepo docenteRepo;
+    private CadeiraRepo cadeiraRepo;
     private QuestaoRespondidaService questaoRespondidaService;
 
     @Autowired
-    public QuestaoService(QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, QuestaoRespondidaService questaoRespondidaService) {
+    public QuestaoService(DocenteRepo docenteRepo, CadeiraRepo cadeiraRepo, QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, QuestaoRespondidaService questaoRespondidaService) {
         this.questaoRepo = questaoRepo;
         this.questaoRespondidaRepo = questaoRespondidaRepo;
         this.questaoRespondidaService = questaoRespondidaService;
+        this.docenteRepo = docenteRepo;
+        this.cadeiraRepo = cadeiraRepo;
     }
 
     public Set<Questao> findAll(){
@@ -55,49 +60,44 @@ public class QuestaoService {
     }
 
 
-    public Optional<Questao> createQuestao(Questao questao){
-        Optional<Questao> optionalQuestao=this.questaoRepo.findByDesignation(questao.getDesignation());
-        if(optionalQuestao.isPresent()){
-            return Optional.empty();
-        }
-        Questao createdQuestao=this.questaoRepo.save(questao);
-        return Optional.of(createdQuestao);
-    }
 
 
-    public Optional<Questao> updateQuestao(String designation, Questao questao){
+    /*public Optional<Questao> updateQuestao(String designation, Questao questao){
         Optional<Questao> optionalQuestao=this.questaoRepo.findByDesignation(designation);
         if(optionalQuestao.isPresent()){
             questaoRepo.save(questao);
             return optionalQuestao;
         }
         return Optional.empty();
-    }
+    }*/
 
     // falta fazer
-    /**
-     * Apaga todas as questoes respondidas associadas a uma questão até se apagar a si
-     * @param designation designação da questao a apagar
-     * @return retorna falso se questao não existir
-     */
-    public Boolean deleteQuestao(String designation){
-        Optional<Questao> optionalQuestao=this.questaoRepo.findByDesignation(designation);
-        if(optionalQuestao.isPresent()){
-            for (QuestaoRespondida qr:this.findAllByQuestao(optionalQuestao.get())) {
-                questaoRespondidaRepo.delete(qr);
+    public Boolean deleteQuestao(String did, String cadeira, int ano, String comp, String momento, String designation){
+        Optional<Componente> optionalComponente = findComponentByType(cadeira,ano,comp);
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(did);
+        if (optionalComponente.isPresent() && optionalDocente.isPresent()) {
+            if (optionalDocente.get().getComponentes().contains(optionalComponente.get())) {
+                for (Momento m : optionalComponente.get().getMomentos()) {
+                    if (m.getDesignation().compareTo(momento) == 0){
+                        for (Questao q : m.getQuestoes()) {
+                            if (q.getDesignation().compareTo(designation) == 0){
+                                delete(q);
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
-            questaoRepo.delete(optionalQuestao.get());
-            return true;
         }
         return false;
     }
 
     // falta fazer
-    public void deleteAll(){
+    /*public void deleteAll(){
         for (Questao q:this.questaoRepo.findAll()) {
             deleteQuestao(q.getDesignation());
         }
-    }
+    }*/
 
     public void delete(Questao q){
         if (q.getMomento() != null){
@@ -115,5 +115,54 @@ public class QuestaoService {
             }
         }
         questaoRepo.delete(q);
+    }
+
+    public Optional<Questao> createQuestao(String did, String cadeira, int ano, String componente, String momento, Questao questao){
+        if (questao.getDesignation() == null){
+            return Optional.empty();
+        }
+        Optional<Componente> optionalComponente = findComponentByType(cadeira,ano,componente);
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(did);
+        if (optionalComponente.isPresent() && optionalDocente.isPresent()) {
+            if (optionalDocente.get().getComponentes().contains(optionalComponente.get())) {
+                for (Momento m : optionalComponente.get().getMomentos()) {
+                    if (m.getDesignation().compareTo(momento) == 0){
+                        float pesoRA = 0.0f;
+                        float pesoM = 0.0f;
+                        for (Questao q : m.getQuestoes()) {
+                            pesoRA += q.getPesoRA();
+                            pesoM += q.getPesoMomento();
+                            if (q.getDesignation().compareTo(questao.getDesignation()) == 0 || pesoM >1 || pesoRA>1){
+                                return Optional.empty();
+                            }
+                        }
+                        questao.setMomento(m);
+                        m.getQuestoes().add(questao);
+                        questaoRepo.save(questao);
+                        questaoRespondidaService.create(questao);
+                        return Optional.of(questao);
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Componente> findComponentByType(String cadeira, int ano, String type) {
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
+        Optional<Componente> optionalComponente = Optional.empty();
+        if (optionalCadeira.isPresent()){
+            for (Oferta o : optionalCadeira.get().getOfertas()) {
+                if (o.getAno() == ano){
+                    for (Componente c : o.getComponentes()) {
+                        if (c.getType().compareTo(type) == 0){
+                            optionalComponente = Optional.of(c);
+                            return optionalComponente;
+                        }
+                    }
+                }
+            }
+        }
+        return optionalComponente;
     }
 }

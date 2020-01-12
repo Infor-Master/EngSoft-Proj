@@ -1,7 +1,9 @@
 package edu.ufp.esof.projecto.controllers;
 
 import edu.ufp.esof.projecto.models.Aluno;
+import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.services.AlunoService;
+import edu.ufp.esof.projecto.services.CadeiraService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/aluno")
@@ -87,6 +90,36 @@ public class AlunoController {
         }
         throw new AlunoAlreadyExistsExcpetion(aluno.getName());
     }
+
+
+
+
+    //-------------------------------------------//
+    //              CADEIRA RELATED              //
+    //-------------------------------------------//
+
+
+
+    @RequestMapping(value = "/{id}/componentes",method = RequestMethod.GET)
+    public ResponseEntity<Set<Componente>> getComponentesFromAluno(@PathVariable("id") String id) throws NoAlunoExcpetion {
+        this.logger.info("Listing Request for componentes from aluno with id " + id);
+
+        Optional<Set<Componente>> optionalComponenteSet =this.alunoService.findComponentes(id);
+        if(optionalComponenteSet.isPresent()) {
+            return ResponseEntity.ok(optionalComponenteSet.get());
+        }
+        throw new NoAlunoExcpetion(id);
+    }
+
+
+
+
+    //-------------------------------------------//
+    //                 EXCEPTIONS                //
+    //-------------------------------------------//
+
+
+
 
     @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Aluno não existente")
     private static class NoAlunoExcpetion extends RuntimeException {

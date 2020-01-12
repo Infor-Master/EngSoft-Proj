@@ -3,8 +3,10 @@ package edu.ufp.esof.projecto.services;
 import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.models.Docente;
+import edu.ufp.esof.projecto.models.Momento;
 import edu.ufp.esof.projecto.repositories.ComponenteRepo;
 import edu.ufp.esof.projecto.repositories.DocenteRepo;
+import edu.ufp.esof.projecto.repositories.MomentoRepo;
 import edu.ufp.esof.projecto.services.filters.Docente.FilterDocenteObject;
 import edu.ufp.esof.projecto.services.filters.Docente.FilterDocenteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +20,20 @@ public class DocenteService {
 
     private DocenteRepo docenteRepo;
     private ComponenteRepo componenteRepo;
+    private MomentoRepo momentoRepo;
     private FilterDocenteService filterService;
     private ComponenteService componenteService;
+    private MomentoRealizadoService momentoRealizadoService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public DocenteService(DocenteRepo docenteRepo, ComponenteRepo componenteRepo, FilterDocenteService filterService, ComponenteService componenteService) {
+    public DocenteService(DocenteRepo docenteRepo, ComponenteRepo componenteRepo, MomentoRepo momentoRepo, FilterDocenteService filterService, ComponenteService componenteService, MomentoRealizadoService momentoRealizadoService) {
         this.docenteRepo = docenteRepo;
         this.componenteRepo = componenteRepo;
+        this.momentoRepo = momentoRepo;
         this.filterService = filterService;
         this.componenteService = componenteService;
+        this.momentoRealizadoService = momentoRealizadoService;
     }
 
 
@@ -134,4 +140,6 @@ public class DocenteService {
         }
         return false;
     }
+
+
 }

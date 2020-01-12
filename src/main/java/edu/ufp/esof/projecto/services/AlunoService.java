@@ -117,4 +117,16 @@ public class AlunoService {
         }*/
         alunoRepo.delete(a);
     }
+
+    public Optional<Set<Componente>> findComponentes(String code){
+        Optional<Aluno> optionalAluno = alunoRepo.findByCode(code);
+        if (optionalAluno.isPresent()){
+            Set<Componente> componentes = new HashSet<>();
+            for (Componente c : optionalAluno.get().getComponentes()) {
+                componentes.add(c);
+            }
+            return Optional.of(componentes);
+        }
+        return Optional.empty();
+    }
 }

@@ -2,6 +2,7 @@ package edu.ufp.esof.projecto.controllers;
 
 import edu.ufp.esof.projecto.models.Docente;
 import edu.ufp.esof.projecto.models.Momento;
+import edu.ufp.esof.projecto.models.MomentoRequest;
 import edu.ufp.esof.projecto.models.Questao;
 import edu.ufp.esof.projecto.services.DocenteService;
 import edu.ufp.esof.projecto.services.MomentoService;
@@ -145,15 +146,15 @@ public class DocenteController {
 
 
 
-    @PostMapping(value = "/{id}/{cadeira}/{ano}/{comp]/momento", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Momento> createMomento(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @RequestBody Momento momento){
+    @PostMapping(value = "/momento", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Momento> createMomento(@RequestBody MomentoRequest momentoRequest){
         this.logger.info("Create Momento Request");
 
-        Optional<Momento> momentoOptional=this.momentoService.createMomento(id,cadeira,ano,comp,momento);
+        Optional<Momento> momentoOptional=this.momentoService.createMomento(momentoRequest.getDocenteNumero(),momentoRequest.getCadeiraNome(),momentoRequest.getAno(),momentoRequest.getComp(), momentoRequest.getMomento());
         if(momentoOptional.isPresent()){
             return ResponseEntity.ok(momentoOptional.get());
         }
-        throw new MomentoAlreadyExistsException(momento.getDesignation());
+        throw new MomentoAlreadyExistsException(momentoRequest.getMomento().getDesignation());
     }
 
 

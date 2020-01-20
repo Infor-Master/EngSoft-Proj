@@ -54,6 +54,19 @@ public class Componente {
         oferta.getComponentes().add(this);
     }
 
+    public Componente(String type, Docente docente, Set<Aluno> alunos, Oferta oferta, Set<Momento> momentos) {
+        this.type = type;
+        this.docente = docente;
+        docente.getComponentes().add(this);
+        this.alunos = alunos;
+        for (Aluno a : alunos) {
+            a.getComponentes().add(this);
+        }
+        this.oferta = oferta;
+        oferta.getComponentes().add(this);
+        this.momentos = momentos;
+    }
+
     public void changeType(String type){
         setType(type);
     }

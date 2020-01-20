@@ -39,4 +39,10 @@ public class QuestaoRespondida {
         this.setQuestao(questao);
     }
 
+    public QuestaoRespondida(MomentoRealizado momento, Criterio criterio, Questao questao) {
+        this.momento = momento;
+        momento.getQuestoes().add(this);
+        this.criterio = criterio;
+        this.questao = questao;
+    }
 }

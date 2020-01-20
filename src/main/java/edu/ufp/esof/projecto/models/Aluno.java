@@ -47,6 +47,19 @@ public class Aluno {
         this.setCode(code);
     }
 
+    public Aluno(String name, String code, Set<Componente> componentes, Set<MomentoRealizado> momentos) {
+        this.name = name;
+        this.code = code;
+        this.componentes = componentes;
+        for (Componente c : componentes) {
+            c.getAlunos().add(this);
+        }
+        this.momentos = momentos;
+        for (MomentoRealizado m : momentos) {
+            m.setAluno(this);
+        }
+    }
+
     public void changeName(String name){
         this.setName(name);
     }
@@ -55,4 +68,17 @@ public class Aluno {
         this.setCode(code);
     }
 
+    public void inscreverNaComponente(Componente c){
+        if (!componentes.contains(c) && !c.getAlunos().contains(this)){
+            c.getAlunos().add(this);
+            componentes.add(c);
+        }
+    }
+
+    public void desinscreverDaComponente(Componente c){
+        if (componentes.contains(c) && c.getAlunos().contains(this)){
+            c.getAlunos().remove(this);
+            componentes.remove(c);
+        }
+    }
 }

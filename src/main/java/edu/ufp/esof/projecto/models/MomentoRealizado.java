@@ -43,6 +43,14 @@ public class MomentoRealizado {
         this.setMomento(momento);
     }
 
+    public MomentoRealizado(Float grade, Aluno aluno, Set<QuestaoRespondida> questoes, Momento momento) {
+        this.grade = grade;
+        this.aluno = aluno;
+        aluno.getMomentos().add(this);
+        this.questoes = questoes;
+        this.momento = momento;
+    }
+
     public float notaRa(){
         float nota = 0.0f;
         for (QuestaoRespondida qr : questoes) {

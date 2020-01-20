@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.services.DocenteService;
 import edu.ufp.esof.projecto.services.MomentoService;
+import edu.ufp.esof.projecto.services.QuestaoService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,9 @@ class DocenteControllerTest {
 
     @MockBean
     private MomentoService momentoService;
+
+    @MockBean
+    private QuestaoService questaoService;
 
     @Autowired
     private ObjectMapper objectMapper;

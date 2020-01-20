@@ -39,4 +39,11 @@ public class ResultadoAprendizagem {
     public ResultadoAprendizagem(String designation){
         this.setDesignation(designation);
     }
+
+    public ResultadoAprendizagem(String designation, Oferta oferta, Set<Questao> questoes) {
+        this.designation = designation;
+        this.oferta = oferta;
+        oferta.getRas().add(this);
+        this.questoes = questoes;
+    }
 }

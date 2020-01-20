@@ -2,6 +2,9 @@ package edu.ufp.esof.projecto.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import edu.ufp.esof.projecto.models.builders.MomentoRealizadoBuilder;
+import edu.ufp.esof.projecto.models.builders.QuestaoBuilder;
+import edu.ufp.esof.projecto.models.builders.QuestaoRespondidaBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -38,5 +41,22 @@ public class Momento {
 
     public Momento(String designation){
         this.setDesignation(designation);
+    }
+
+    public Momento(String designation, Float peso, Componente componente, Set<Questao> questoes) {
+        this.designation = designation;
+        this.peso = peso;
+        this.componente = componente;
+        componente.getMomentos().add(this);
+        this.questoes = questoes;
+
+        // ANTES
+        /*for (Aluno a : this.componente.getAlunos()) {
+            MomentoRealizado mr = new MomentoRealizadoBuilder().setAluno(a).setMomento(this)
+                    .build();
+            for (Questao q : this.getQuestoes()) {
+                QuestaoRespondida qr = new QuestaoRespondidaBuilder().setMomento(mr).setQuestao(q).build();
+            }
+        }*/
     }
 }

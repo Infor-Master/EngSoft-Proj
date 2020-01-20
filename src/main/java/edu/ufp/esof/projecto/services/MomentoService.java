@@ -1,10 +1,9 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.*;
-import edu.ufp.esof.projecto.repositories.CadeiraRepo;
-import edu.ufp.esof.projecto.repositories.DocenteRepo;
-import edu.ufp.esof.projecto.repositories.MomentoRealizadoRepo;
-import edu.ufp.esof.projecto.repositories.MomentoRepo;
+import edu.ufp.esof.projecto.models.builders.MomentoBuilder;
+import edu.ufp.esof.projecto.models.builders.MomentoRealizadoBuilder;
+import edu.ufp.esof.projecto.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,19 +18,21 @@ public class MomentoService {
     private MomentoRepo momentoRepo;
     private DocenteRepo docenteRepo;
     private CadeiraRepo cadeiraRepo;
+    private ComponenteRepo componenteRepo;
     private MomentoRealizadoRepo momentoRealizadoRepo;
     private QuestaoService questaoService;
     private MomentoRealizadoService momentoRealizadoService;
 
 
     @Autowired
-    public MomentoService(DocenteRepo docenteRepo, CadeiraRepo cadeiraRepo, MomentoRepo momentoRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoService questaoService, MomentoRealizadoService momentoRealizadoService) {
+    public MomentoService(DocenteRepo docenteRepo, CadeiraRepo cadeiraRepo, ComponenteRepo componenteRepo, MomentoRepo momentoRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoService questaoService, MomentoRealizadoService momentoRealizadoService) {
         this.momentoRepo = momentoRepo;
         this.momentoRealizadoRepo = momentoRealizadoRepo;
         this.questaoService = questaoService;
         this.momentoRealizadoService = momentoRealizadoService;
         this.docenteRepo = docenteRepo;
         this.cadeiraRepo = cadeiraRepo;
+        this.componenteRepo = componenteRepo;
     }
 
 
@@ -113,15 +114,35 @@ public class MomentoService {
                 Float peso = 0.0f;
                 for (Momento m : optionalComponente.get().getMomentos()) {
                     peso = peso + m.getPeso();
-                    if (m.getDesignation().compareTo(momento.getDesignation()) == 0 || peso>1.0f){
+                    if (m.getDesignation().compareTo(momento.getDesignation()) == 0 || peso>=1.0f){
                         return Optional.empty();
                     }
+                }
+
+                if (momento.getDesignation() != null && momento.getPeso() != 0.0f){
+                    if (peso + momento.getPeso()> 1){
+                        momento.setPeso(1 - momento.getPeso());
+                    }
+                    Momento m = new MomentoBuilder().setDesignation(momento.getDesignation())
+                            .setComponente(optionalComponente.get())
+                            .setPeso(momento.getPeso())
+                            .build();
+                    optionalComponente.get().getMomentos().add(m);
+                    for (Aluno a : optionalComponente.get().getAlunos()) {
+                        MomentoRealizado mr = new MomentoRealizadoBuilder().setAluno(a).setMomento(m).setGrade(0.0f).build();
+                        //a.getMomentos().add(mr);
+                        momentoRealizadoRepo.save(mr);
+                    }
+                    componenteRepo.save(optionalComponente.get());
+                }
+                else {
+                    return Optional.empty();
                 }
                 momento.setComponente(optionalComponente.get());
                 optionalComponente.get().getMomentos().add(momento);
                 momentoRepo.save(momento);
                 //componenteRepo.save(optionalComponente.get()); // verificar se deve estar ou nao
-                momentoRealizadoService.create(momento);
+                //momentoRealizadoService.create(momento);
                 return Optional.of(momento);
             }
         }

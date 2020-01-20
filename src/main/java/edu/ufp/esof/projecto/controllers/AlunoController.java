@@ -111,6 +111,29 @@ public class AlunoController {
         throw new NoAlunoExcpetion(id);
     }
 
+    // necessita do id da componente no body
+    @PostMapping(value = "/{id}/associate", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Aluno> associateAluno(@PathVariable("id") String id, @RequestBody Componente c){
+        this.logger.info("Associate Aluno with code = " + id);
+
+        Optional<Aluno> alunoOptional=this.alunoService.associateAluno(id, c);
+        if(alunoOptional.isPresent()){
+            return ResponseEntity.ok(alunoOptional.get());
+        }
+        throw new NoAlunoExcpetion(id);
+    }
+
+    @RequestMapping(value = "/{id}/{componenteId}", method = RequestMethod.DELETE)
+    public ResponseEntity<Aluno> desassociateAluno(@PathVariable("id") String id, @PathVariable("componenteId") Long componenteId) throws NoAlunoExcpetion{
+        this.logger.info("Desassociate Request for aluno with id " + id);
+
+        Optional<Aluno> alunoOptional=this.alunoService.desassociateAluno(id, componenteId);
+        if(alunoOptional.isPresent()){
+            return ResponseEntity.ok(alunoOptional.get());
+        }
+        throw new NoAlunoExcpetion(id);
+    }
+
 
 
 

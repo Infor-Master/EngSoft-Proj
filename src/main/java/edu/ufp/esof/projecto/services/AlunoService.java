@@ -1,10 +1,9 @@
 package edu.ufp.esof.projecto.services;
 
-import edu.ufp.esof.projecto.models.Aluno;
-import edu.ufp.esof.projecto.models.Componente;
-import edu.ufp.esof.projecto.models.Criterio;
-import edu.ufp.esof.projecto.models.MomentoRealizado;
-import edu.ufp.esof.projecto.repositories.AlunoRepo;
+import edu.ufp.esof.projecto.models.*;
+import edu.ufp.esof.projecto.models.builders.MomentoRealizadoBuilder;
+import edu.ufp.esof.projecto.models.builders.QuestaoRespondidaBuilder;
+import edu.ufp.esof.projecto.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +17,22 @@ import java.util.Set;
 public class AlunoService {
 
     private AlunoRepo alunoRepo;
+    private ComponenteRepo componenteRepo;
+    private MomentoRealizadoRepo momentoRealizadoRepo;
+    private QuestaoRespondidaRepo questaoRespondidaRepo;
+    private CriterioRepo criterioRepo;
     private MomentoRealizadoService momentoRealizadoService;
     private ComponenteService componenteService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public AlunoService(AlunoRepo alunoRepo, MomentoRealizadoService momentoRealizadoService, ComponenteService componenteService) {
+    public AlunoService(AlunoRepo alunoRepo, ComponenteRepo componenteRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, CriterioRepo criterioRepo, MomentoRealizadoService momentoRealizadoService, ComponenteService componenteService) {
         this.momentoRealizadoService = momentoRealizadoService;
         this.alunoRepo = alunoRepo;
+        this.componenteRepo = componenteRepo;
+        this.momentoRealizadoRepo = momentoRealizadoRepo;
+        this.questaoRespondidaRepo = questaoRespondidaRepo;
+        this.criterioRepo = criterioRepo;
         this.componenteService = componenteService;
     }
 
@@ -205,6 +212,61 @@ public class AlunoService {
                 }
             }
             return Optional.of(notas);
+        }
+        return Optional.empty();
+    }
+
+    // necessita do id da componente no body
+    public Optional<Aluno>associateAluno(String id, Componente c){
+        Optional<Aluno>optionalAluno = alunoRepo.findByCode(id);
+        Optional<Componente>optionalComponente = componenteRepo.findById(c.getId());
+        if (optionalAluno.isPresent() && optionalComponente.isPresent()){
+            optionalAluno.get().inscreverNaComponente(optionalComponente.get());
+            for (Momento m:optionalComponente.get().getMomentos()) {
+                MomentoRealizado mr = new MomentoRealizadoBuilder().setAluno(optionalAluno.get())
+                        .setMomento(m)
+                        .build();
+                optionalAluno.get().getMomentos().add(mr);
+                for (Questao q : m.getQuestoes()) {
+                    QuestaoRespondida qr = new QuestaoRespondidaBuilder().setMomento(mr).
+                            setQuestao(q).
+                            build();
+                }
+                momentoRealizadoRepo.save(mr);
+            }
+            alunoRepo.save(optionalAluno.get());
+            componenteRepo.save(optionalComponente.get());
+            return optionalAluno;
+        }
+        return Optional.empty();
+    }
+
+    // necessita do id da componente no body
+    public Optional<Aluno>desassociateAluno(String id, Long cid){
+        Optional<Aluno>optionalAluno = alunoRepo.findByCode(id);
+        Optional<Componente>optionalComponente = componenteRepo.findById(cid);
+        if (optionalAluno.isPresent() && optionalComponente.isPresent()){
+            optionalAluno.get().desinscreverDaComponente(optionalComponente.get());
+            while (!optionalAluno.get().getMomentos().isEmpty()){
+                Iterator<MomentoRealizado> momentos = optionalAluno.get().getMomentos().iterator();
+                MomentoRealizado mr = momentos.next();
+                if (mr.getMomento().getComponente().getId() == optionalComponente.get().getId()){
+                    while(!mr.getQuestoes().isEmpty()){
+                        Iterator<QuestaoRespondida> questoes = mr.getQuestoes().iterator();
+                        QuestaoRespondida qr = questoes.next();
+                        criterioRepo.delete(qr.getCriterio());
+                        qr.setCriterio(null);
+                        mr.getQuestoes().remove(qr);
+                        qr.setMomento(null);
+                        qr.setQuestao(null);
+                        questaoRespondidaRepo.delete(qr);
+                    }
+                    momentoRealizadoRepo.delete(mr);
+                }
+            }
+            alunoRepo.save(optionalAluno.get());
+            componenteRepo.save(optionalComponente.get());
+            return optionalAluno;
         }
         return Optional.empty();
     }

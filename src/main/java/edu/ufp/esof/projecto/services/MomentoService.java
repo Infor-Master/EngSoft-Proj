@@ -3,10 +3,12 @@ package edu.ufp.esof.projecto.services;
 import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.models.builders.MomentoBuilder;
 import edu.ufp.esof.projecto.models.builders.MomentoRealizadoBuilder;
+import edu.ufp.esof.projecto.models.builders.QuestaoRespondidaBuilder;
 import edu.ufp.esof.projecto.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
@@ -65,13 +67,11 @@ public class MomentoService {
         return momentosRealizados;
     }
 
-
-
-    public Boolean deleteMomento(String cadeira, int ano, String comp, String designation){
-        Optional<Componente> optionalComponente = findComponenteByType(cadeira,ano,comp);
+    public Boolean deleteMomento(MomentoRequest momentoRequest){
+        Optional<Componente> optionalComponente = findComponenteByType(momentoRequest.getCadeiraNome(),momentoRequest.getAno(),momentoRequest.getComp());
         if (optionalComponente.isPresent()){
             for (Momento m:optionalComponente.get().getMomentos()) {
-                if (m.getDesignation().compareTo(designation) == 0){
+                if (m.getDesignation().equals(momentoRequest.getMomento().getDesignation())){
                     delete(m);
                     return true;
                 }
@@ -90,13 +90,11 @@ public class MomentoService {
             Questao q = questoes.next();
             questaoService.delete(q);
         }
-        /*
-        for (Questao q : m.getQuestoes()) {
-            questaoService.delete(q);
-        }*/
         Optional<Iterable<MomentoRealizado>> optionalMomentoRealizado =momentoRealizadoRepo.findAllByMomento(m);
         if (optionalMomentoRealizado.isPresent()){
-            for (MomentoRealizado mr : optionalMomentoRealizado.get()) {
+            while(!optionalMomentoRealizado.isEmpty()){
+                Iterator<MomentoRealizado> momentosRealizados = optionalMomentoRealizado.get().iterator();
+                MomentoRealizado mr = momentosRealizados.next();
                 momentoRealizadoService.delete(mr);
             }
         }
@@ -104,51 +102,44 @@ public class MomentoService {
     }
 
     public Optional<Momento> createMomento(String id, String cadeira, int ano, String comp, Momento momento){
-        if (momento.getDesignation() == null){
+        if (momento.getDesignation() == null || momento.getPeso()<=0){
             return Optional.empty();
+        }
+        Float pesoMomento = 0.0f;
+        Float pesoRa = 0.0f;
+        for (Questao q : momento.getQuestoes()) {
+            pesoMomento += q.getPesoMomento();
+            pesoRa += q.getPesoRA();
+            if (pesoRa>1.0f || pesoMomento >1.0f){
+                return Optional.empty();
+            }
         }
         Optional<Componente> optionalComponente = findComponenteByType(cadeira,ano,comp);
         Optional<Docente> optionalDocente = docenteRepo.findByCode(id);
         if (optionalComponente.isPresent() && optionalDocente.isPresent()){
             if (optionalDocente.get().getComponentes().contains(optionalComponente.get())){
                 Float peso = 0.0f;
-                for (Momento m : optionalComponente.get().getMomentos()) {
+                Componente componente=optionalComponente.get();
+                for (Momento m : componente.getMomentos()) {
                     peso = peso + m.getPeso();
-                    if (m.getDesignation().compareTo(momento.getDesignation()) == 0 || peso>=1.0f){
+                    if (m.getDesignation().equals(momento.getDesignation()) || peso>=1.0f){
                         return Optional.empty();
                     }
                 }
-
-                if (momento.getDesignation() != null && momento.getPeso() != 0.0f){
-                    if (peso + momento.getPeso()> 1){
-                        momento.setPeso(1 - momento.getPeso());
+                componente.addMomento(momento);
+                for (Aluno a : componente.getAlunos()) {
+                    MomentoRealizado mr = new MomentoRealizadoBuilder().setAluno(a).setMomento(momento).setGrade(0.0f).build();
+                    for (Questao q : momento.getQuestoes()) {
+                        QuestaoRespondida qr = new QuestaoRespondidaBuilder().setQuestao(q).setMomento(mr).build();
                     }
-                    Momento m = new MomentoBuilder().setDesignation(momento.getDesignation())
-                            .setComponente(optionalComponente.get())
-                            .setPeso(momento.getPeso())
-                            .build();
-                    optionalComponente.get().getMomentos().add(m);
-                    for (Aluno a : optionalComponente.get().getAlunos()) {
-                        MomentoRealizado mr = new MomentoRealizadoBuilder().setAluno(a).setMomento(m).setGrade(0.0f).build();
-                        //a.getMomentos().add(mr);
-                        momentoRealizadoRepo.save(mr);
-                    }
-                    componenteRepo.save(optionalComponente.get());
+                    momentoRealizadoRepo.save(mr);
                 }
-                else {
-                    return Optional.empty();
-                }
-                momento.setComponente(optionalComponente.get());
-                optionalComponente.get().getMomentos().add(momento);
                 momentoRepo.save(momento);
-                //componenteRepo.save(optionalComponente.get()); // verificar se deve estar ou nao
-                //momentoRealizadoService.create(momento);
                 return Optional.of(momento);
             }
         }
         return Optional.empty();
     }
-
 
     public Optional<Componente> findComponenteByType(String cadeira, int ano, String type) {
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
@@ -166,6 +157,55 @@ public class MomentoService {
             }
         }
         return optionalComponente;
+    }
+
+    public Optional<Momento> updateMomento(MomentoRequest momentoRequest){
+        if (momentoRequest.getMomento() == null ||
+                momentoRequest.getAno() <= 0 ||
+                momentoRequest.getDocenteNumero() == null ||
+                momentoRequest.getCadeiraNome() == null ||
+                momentoRequest.getComp() == null ||
+                momentoRequest.getMomentoNome() == null){
+            return Optional.empty();
+        }
+        Optional<Componente> optionalComponente = findComponenteByType(momentoRequest.getCadeiraNome(),momentoRequest.getAno(), momentoRequest.getComp());
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(momentoRequest.getDocenteNumero());
+        if (optionalComponente.isPresent() && optionalDocente.isPresent()){
+            Componente componente = optionalComponente.get();
+            Docente docente = optionalDocente.get();
+            if (docente.getComponentes().contains(componente)){
+                Momento upMomento = momentoRequest.getMomento();
+                for (Momento m : componente.getMomentos()) {
+                    if (m.getDesignation().equals(momentoRequest.getMomentoNome())){
+                        if (upMomento.getDesignation()!=null){
+                            Boolean checkName = true;
+                            for (Momento aux : componente.getMomentos()) {
+                                if (aux.getDesignation().equals(upMomento.getDesignation())){
+                                    checkName = false;
+                                    break;
+                                }
+                            }
+                            if (checkName){
+                                m.setDesignation(upMomento.getDesignation());
+                            }
+                        }
+                        if (upMomento.getPeso() != null && upMomento.getPeso() != 0.0f){
+                            Float peso = 0.0f;
+                            for (Momento aux:componente.getMomentos()) {
+                                peso+=aux.getPeso();
+                            }
+                            peso-=m.getPeso();
+                            if (upMomento.getPeso()<= (1-peso)){
+                                m.setPeso(upMomento.getPeso());
+                            }
+                        }
+                        momentoRepo.save(m);
+                        return Optional.of(m);
+                    }
+                }
+            }
+        }
+        return Optional.empty();
     }
 }
 

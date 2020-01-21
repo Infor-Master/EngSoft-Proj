@@ -37,7 +37,7 @@ public class Aluno {
     @EqualsAndHashCode.Exclude  // perguntar ao professor
     private Set<Componente> componentes=new HashSet<>();
 
-    @OneToMany(mappedBy = "aluno",cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "aluno",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     //@JsonManagedReference(value = "alunos-momentos")
     //@JsonIgnore
     private Set<MomentoRealizado> momentos=new HashSet<>();

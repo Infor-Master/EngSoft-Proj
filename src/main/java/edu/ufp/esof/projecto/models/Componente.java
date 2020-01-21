@@ -78,6 +78,13 @@ public class Componente {
         }
     }
 
+    public void addMomento(Momento momento){
+        if(!this.getMomentos().contains(momento)){
+                this.getMomentos().add(momento);
+                momento.setComponente(this);
+        }
+    }
+
     public Docente removeDocente(){
         Docente d = docente;
         if (docente != null){

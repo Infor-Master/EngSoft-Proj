@@ -49,14 +49,5 @@ public class Momento {
         this.componente = componente;
         componente.getMomentos().add(this);
         this.questoes = questoes;
-
-        // ANTES
-        /*for (Aluno a : this.componente.getAlunos()) {
-            MomentoRealizado mr = new MomentoRealizadoBuilder().setAluno(a).setMomento(this)
-                    .build();
-            for (Questao q : this.getQuestoes()) {
-                QuestaoRespondida qr = new QuestaoRespondidaBuilder().setMomento(mr).setQuestao(q).build();
-            }
-        }*/
     }
 }

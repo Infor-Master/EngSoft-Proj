@@ -47,10 +47,6 @@ public class MomentoRealizadoService {
             QuestaoRespondida qr = questoes.next();
             questaoRespondidaService.delete(qr);
         }
-        /*
-        for (QuestaoRespondida qr : mr.getQuestoes()) {
-            questaoRespondidaService.delete(qr);
-        }*/
         momentoRealizadoRepo.delete(mr);
     }
 

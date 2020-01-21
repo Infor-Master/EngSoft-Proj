@@ -3,7 +3,7 @@ package edu.ufp.esof.projecto.services;
 import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Escala;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
-import edu.ufp.esof.projecto.repositories.CriterioRepo;
+import edu.ufp.esof.projecto.repositories.EscalaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +13,15 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class CriterioService {
+public class EscalaService {
 
-    private CriterioRepo criterioRepo;
+    private EscalaRepo escalaRepo;
     private CadeiraRepo cadeiraRepo;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public CriterioService(CriterioRepo criterioRepo, CadeiraRepo cadeiraRepo) {
-        this.criterioRepo = criterioRepo;
+    public EscalaService(EscalaRepo escalaRepo, CadeiraRepo cadeiraRepo) {
+        this.escalaRepo = escalaRepo;
         this.cadeiraRepo = cadeiraRepo;
     }
 
@@ -55,7 +55,7 @@ public class CriterioService {
                 }
             }
             optionalCadeira.get().getEscalas().add(escala);
-            this.criterioRepo.save(escala);
+            this.escalaRepo.save(escala);
             return Optional.of(escala);
         }
         return Optional.empty();
@@ -99,7 +99,7 @@ public class CriterioService {
                 old.setNota(newCr.getNota());
             }
         }
-        criterioRepo.save(old);
+        escalaRepo.save(old);
         return Optional.of(old);
     }
 
@@ -109,7 +109,7 @@ public class CriterioService {
             for (Escala c : optionalCadeira.get().getEscalas()) {
                 if (c.getDesignation().compareTo(designation) == 0){
                     optionalCadeira.get().getEscalas().remove(c);
-                    criterioRepo.delete(c);
+                    escalaRepo.delete(c);
                     return true;
                 }
             }
@@ -124,12 +124,12 @@ public class CriterioService {
                 Iterator<Escala> criterios = optionalCadeira.get().getEscalas().iterator();
                 Escala c=criterios.next();
                 optionalCadeira.get().getEscalas().remove(c);
-                criterioRepo.delete(c);
+                escalaRepo.delete(c);
             }
         }
     }
 
     public void delete(Escala c){
-        criterioRepo.delete(c);
+        escalaRepo.delete(c);
     }
 }

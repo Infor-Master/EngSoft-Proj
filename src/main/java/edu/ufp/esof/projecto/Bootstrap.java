@@ -18,7 +18,7 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
     private AlunoRepo alunoRepo;
     private CadeiraRepo cadeiraRepo;
     private ComponenteRepo componenteRepo;
-    private CriterioRepo criterioRepo;
+    private EscalaRepo escalaRepo;
     private DocenteRepo docenteRepo;
     private MomentoRealizadoRepo momentoRealizadoRepo;
     private MomentoRepo momentoRepo;
@@ -30,7 +30,7 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
     public Bootstrap(AlunoRepo alunoRepo, CadeiraRepo cadeiraRepo,
-                     ComponenteRepo componenteRepo, CriterioRepo criterioRepo,
+                     ComponenteRepo componenteRepo, EscalaRepo escalaRepo,
                      DocenteRepo docenteRepo, MomentoRealizadoRepo momentoRealizadoRepo,
                      MomentoRepo momentoRepo, OfertaRepo ofertaRepo,
                      QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo,
@@ -39,7 +39,7 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         this.alunoRepo = alunoRepo;
         this.cadeiraRepo = cadeiraRepo;
         this.componenteRepo = componenteRepo;
-        this.criterioRepo = criterioRepo;
+        this.escalaRepo = escalaRepo;
         this.docenteRepo = docenteRepo;
         this.momentoRealizadoRepo = momentoRealizadoRepo;
         this.momentoRepo = momentoRepo;

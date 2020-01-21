@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class CriterioRequest {
+public class EscalaRequest {
     private String cadeiraNome;
-    private Criterio criterio;
+    private Escala escala;
 }

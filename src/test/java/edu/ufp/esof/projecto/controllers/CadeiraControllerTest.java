@@ -7,7 +7,7 @@ import edu.ufp.esof.projecto.models.Escala;
 import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.services.CadeiraService;
 import edu.ufp.esof.projecto.services.ComponenteService;
-import edu.ufp.esof.projecto.services.CriterioService;
+import edu.ufp.esof.projecto.services.EscalaService;
 import edu.ufp.esof.projecto.services.OfertaService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,7 +39,7 @@ class CadeiraControllerTest {
     private ComponenteService componenteService;
 
     @MockBean
-    private CriterioService criterioService;
+    private EscalaService escalaService;
 
     @MockBean
     private OfertaService ofertaService;
@@ -290,7 +290,7 @@ class CadeiraControllerTest {
         escalas.add(escala1);
         escalas.add(escala2);
         escalas.add(escala3);
-        when(this.criterioService.findAll("Teste")).thenReturn(escalas);
+        when(this.escalaService.findAll("Teste")).thenReturn(escalas);
         String responseJson=this.mockMvc.perform(
                 get("/cadeira/Teste/escalas")
         ).andExpect(
@@ -315,7 +315,7 @@ class CadeiraControllerTest {
     void getCriterio() throws Exception {
         Cadeira cadeira=new Cadeira("Teste","123");
         Escala escala =new Escala("bom", 10F);
-        when(this.criterioService.findByDesignation("Teste", "bom")).thenReturn(Optional.of(escala));
+        when(this.escalaService.findByDesignation("Teste", "bom")).thenReturn(Optional.of(escala));
         String responseJson=this.mockMvc.perform(
                 get("/cadeira/Teste/escalas/bom")
         ).andExpect(
@@ -335,7 +335,7 @@ class CadeiraControllerTest {
         Escala escala =new Escala("bom", 10F);
         Escala escala2 =new Escala("bom", 15F);
 
-        when(this.criterioService.updateCriterio("Teste","bom", escala2)).thenReturn(Optional.of(escala2));
+        when(this.escalaService.updateCriterio("Teste","bom", escala2)).thenReturn(Optional.of(escala2));
         String jsonRequest=this.objectMapper.writeValueAsString(escala2);
         this.mockMvc.perform(
                 put("/cadeira/Teste/escalas/bom").contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -356,7 +356,7 @@ class CadeiraControllerTest {
     void createCriterio() throws Exception {
         Cadeira cadeira=new Cadeira("Teste","123");
         Escala escala =new Escala("bom", 10F);
-        when(criterioService.createCriterio("Teste", escala)).thenReturn(Optional.of(escala));
+        when(escalaService.createCriterio("Teste", escala)).thenReturn(Optional.of(escala));
         String jsonRequest=this.objectMapper.writeValueAsString(escala);
 
         this.mockMvc.perform(
@@ -364,7 +364,7 @@ class CadeiraControllerTest {
         ).andExpect(status().isOk());
 
         Escala BADcriterio=new Escala("bom", 99F);
-        when(criterioService.createCriterio("Teste", BADcriterio)).thenReturn(Optional.empty());
+        when(escalaService.createCriterio("Teste", BADcriterio)).thenReturn(Optional.empty());
         String BADjsonRequest=this.objectMapper.writeValueAsString(BADcriterio);
 
         this.mockMvc.perform(

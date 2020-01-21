@@ -20,19 +20,19 @@ public class AlunoService {
     private ComponenteRepo componenteRepo;
     private MomentoRealizadoRepo momentoRealizadoRepo;
     private QuestaoRespondidaRepo questaoRespondidaRepo;
-    private CriterioRepo criterioRepo;
+    private EscalaRepo escalaRepo;
     private MomentoRealizadoService momentoRealizadoService;
     private ComponenteService componenteService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public AlunoService(AlunoRepo alunoRepo, ComponenteRepo componenteRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, CriterioRepo criterioRepo, MomentoRealizadoService momentoRealizadoService, ComponenteService componenteService) {
+    public AlunoService(AlunoRepo alunoRepo, ComponenteRepo componenteRepo, MomentoRealizadoRepo momentoRealizadoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, EscalaRepo escalaRepo, MomentoRealizadoService momentoRealizadoService, ComponenteService componenteService) {
         this.momentoRealizadoService = momentoRealizadoService;
         this.alunoRepo = alunoRepo;
         this.componenteRepo = componenteRepo;
         this.momentoRealizadoRepo = momentoRealizadoRepo;
         this.questaoRespondidaRepo = questaoRespondidaRepo;
-        this.criterioRepo = criterioRepo;
+        this.escalaRepo = escalaRepo;
         this.componenteService = componenteService;
     }
 
@@ -254,7 +254,7 @@ public class AlunoService {
                     while(!mr.getQuestoes().isEmpty()){
                         Iterator<QuestaoRespondida> questoes = mr.getQuestoes().iterator();
                         QuestaoRespondida qr = questoes.next();
-                        criterioRepo.delete(qr.getEscala());
+                        escalaRepo.delete(qr.getEscala());
                         qr.setEscala(null);
                         mr.getQuestoes().remove(qr);
                         qr.setMomento(null);

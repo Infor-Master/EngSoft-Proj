@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CriterioRepo extends CrudRepository<Escala,Long> {
+public interface EscalaRepo extends CrudRepository<Escala,Long> {
     Optional<Escala> findByDesignation(String designation);
 }

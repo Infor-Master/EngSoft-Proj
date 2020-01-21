@@ -6,7 +6,7 @@ import edu.ufp.esof.projecto.models.Escala;
 import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.services.CadeiraService;
 import edu.ufp.esof.projecto.services.ComponenteService;
-import edu.ufp.esof.projecto.services.CriterioService;
+import edu.ufp.esof.projecto.services.EscalaService;
 import edu.ufp.esof.projecto.services.OfertaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +28,14 @@ public class CadeiraController {
 
     private CadeiraService cadeiraService;
     private ComponenteService componenteService;
-    private CriterioService criterioService;
+    private EscalaService escalaService;
     private OfertaService ofertaService;
 
     @Autowired
-    public CadeiraController(CadeiraService cadeiraService, ComponenteService componenteService, CriterioService criterioService, OfertaService ofertaService) {
+    public CadeiraController(CadeiraService cadeiraService, ComponenteService componenteService, EscalaService escalaService, OfertaService ofertaService) {
         this.cadeiraService = cadeiraService;
         this.componenteService = componenteService;
-        this.criterioService = criterioService;
+        this.escalaService = escalaService;
         this.ofertaService = ofertaService;
     }
 
@@ -189,14 +189,14 @@ public class CadeiraController {
     public ResponseEntity<Iterable<Escala>> getAllCriterios(@PathVariable("cadeira") String cadeira){
         this.logger.info("Listing Request for escalas");
 
-        return ResponseEntity.ok(this.criterioService.findAll(cadeira));
+        return ResponseEntity.ok(this.escalaService.findAll(cadeira));
     }
 
     @RequestMapping(value = "/{cadeira}/criterios/{designation}",method = RequestMethod.GET)
     public ResponseEntity<Escala> getCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation) throws NoCriterioExcpetion {
         this.logger.info("Listing Request for escala " + designation + " of " + cadeira);
 
-        Optional<Escala> optionalCriterio =this.criterioService.findByDesignation(cadeira, designation);
+        Optional<Escala> optionalCriterio =this.escalaService.findByDesignation(cadeira, designation);
         if(optionalCriterio.isPresent()) {
             return ResponseEntity.ok(optionalCriterio.get());
         }
@@ -207,7 +207,7 @@ public class CadeiraController {
     public ResponseEntity<Escala>editCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation, @RequestBody Escala escala) throws NoCriterioExcpetion{
         this.logger.info("Update Request for escala " + designation + " of " + cadeira);
 
-        Optional<Escala> optionalCriterio =this.criterioService.updateCriterio(cadeira, designation, escala);
+        Optional<Escala> optionalCriterio =this.escalaService.updateCriterio(cadeira, designation, escala);
         if(optionalCriterio.isPresent()) {
             return ResponseEntity.ok(optionalCriterio.get());
         }
@@ -218,7 +218,7 @@ public class CadeiraController {
     public ResponseEntity<String> deleteAllCriterios(@PathVariable("cadeira") String cadeira){
         this.logger.info("Delete Request for every escala of " + cadeira);
 
-        criterioService.deleteAll(cadeira);
+        escalaService.deleteAll(cadeira);
         return ResponseEntity.ok("Deleted every escala from " + cadeira);
     }
 
@@ -226,7 +226,7 @@ public class CadeiraController {
     public ResponseEntity<String> deleteCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation) throws NoCriterioExcpetion{
         this.logger.info("Delete Request for escala " + designation + " from " + cadeira);
 
-        Boolean deleted = this.criterioService.deleteCriterio(cadeira, designation);
+        Boolean deleted = this.escalaService.deleteCriterio(cadeira, designation);
         if(deleted) {
             return ResponseEntity.ok("Delete escala " + designation);
         }
@@ -237,7 +237,7 @@ public class CadeiraController {
     public ResponseEntity<Escala> createCriterio(@PathVariable("cadeira") String cadeira, @RequestBody Escala escala){
         this.logger.info("Create Escala Request for " + cadeira);
 
-        Optional<Escala> criterioOptional=this.criterioService.createCriterio(cadeira, escala);
+        Optional<Escala> criterioOptional=this.escalaService.createCriterio(cadeira, escala);
         if(criterioOptional.isPresent()){
             return ResponseEntity.ok(criterioOptional.get());
         }

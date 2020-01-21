@@ -11,4 +11,5 @@ public class MomentoRequest {
     private int ano;
     private String comp;
     private Momento momento;
+    private String momentoNome;
 }

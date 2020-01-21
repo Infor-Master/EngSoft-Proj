@@ -157,19 +157,28 @@ public class DocenteController {
         throw new MomentoAlreadyExistsException(momentoRequest.getMomento().getDesignation());
     }
 
+    @RequestMapping(value = "/momento", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteMomento(@RequestBody MomentoRequest momentoRequest) throws NoMomentoException {
+        this.logger.info("Delete Momento Request");
 
-    // Falta verificação se professor dá a cadeira
-    @RequestMapping(value = "/{id}/{cadeira}/{ano}/{comp]/momento/{nome}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteMomento(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @PathVariable("nome") String nome) throws NoMomentoException {
-        this.logger.info("Delete Request for docente with id " + id);
-
-        Boolean deleted = this.momentoService.deleteMomento(cadeira,ano,comp,nome);
+        //Boolean deleted = this.momentoService.deleteMomento(cadeira,ano,comp,nome);
+        Boolean deleted = this.momentoService.deleteMomento(momentoRequest);
         if(deleted) {
-            return ResponseEntity.ok("Deleted momento " + nome);
+            return ResponseEntity.ok("Deleted momento " + momentoRequest.getMomento().getDesignation());
         }
-        throw new DocenteController.NoDocenteException(id);
+        throw new DocenteController.NoDocenteException(momentoRequest.getDocenteNumero());
     }
 
+    @RequestMapping(value = "/momento", method = RequestMethod.PUT)
+    public ResponseEntity<Momento> updateMomento(@RequestBody MomentoRequest momentoRequest){
+        this.logger.info("Update Request for momento");
+
+        Optional<Momento> optionalMomento =this.momentoService.updateMomento(momentoRequest);
+        if(optionalMomento.isPresent()) {
+            return ResponseEntity.ok(optionalMomento.get());
+        }
+        throw new NoDocenteException(momentoRequest.getDocenteNumero());
+    }
 
 
 
@@ -194,7 +203,7 @@ public class DocenteController {
 
     // Falta verificação se professor dá a cadeira
     @RequestMapping(value = "/{id}/{cadeira}/{ano}/{comp]/{momento}/{nome}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteMomento(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @PathVariable("momento") String momento, @PathVariable("nome") String nome) throws NoMomentoException {
+    public ResponseEntity<String> deleteQuestao(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @PathVariable("momento") String momento, @PathVariable("nome") String nome) throws NoMomentoException {
         this.logger.info("Delete Request for questao");
 
         Boolean deleted = this.questaoService.deleteQuestao(id,cadeira,ano,comp,momento,nome);

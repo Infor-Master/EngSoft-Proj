@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -91,7 +92,9 @@ public class QuestaoService {
         }
         Optional<Iterable<QuestaoRespondida>> optionalQuestaoRespondidas = questaoRespondidaRepo.findAllByQuestao(q);
         if (optionalQuestaoRespondidas.isPresent()){
-            for (QuestaoRespondida qr : optionalQuestaoRespondidas.get()) {
+            while(!optionalQuestaoRespondidas.isEmpty()){
+                Iterator<QuestaoRespondida> questoesRespondidas = optionalQuestaoRespondidas.get().iterator();
+                QuestaoRespondida qr = questoesRespondidas.next();
                 questaoRespondidaService.delete(qr);
             }
         }

@@ -8,4 +8,5 @@ import lombok.Data;
 public class EscalaRequest {
     private String cadeiraNome;
     private Escala escala;
+    private String designation;
 }

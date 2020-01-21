@@ -1,10 +1,8 @@
 package edu.ufp.esof.projecto.controllers;
 
-import edu.ufp.esof.projecto.models.Docente;
-import edu.ufp.esof.projecto.models.Momento;
-import edu.ufp.esof.projecto.models.MomentoRequest;
-import edu.ufp.esof.projecto.models.Questao;
+import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.services.DocenteService;
+import edu.ufp.esof.projecto.services.EscalaService;
 import edu.ufp.esof.projecto.services.MomentoService;
 import edu.ufp.esof.projecto.services.QuestaoService;
 import org.slf4j.Logger;
@@ -28,12 +26,14 @@ public class DocenteController {
     private DocenteService docenteService;
     private MomentoService momentoService;
     private QuestaoService questaoService;
+    private EscalaService escalaService;
 
     @Autowired
-    public DocenteController(DocenteService docenteService, MomentoService momentoService, QuestaoService questaoService) {
+    public DocenteController(DocenteService docenteService, MomentoService momentoService, QuestaoService questaoService, EscalaService escalaService) {
         this.docenteService = docenteService;
         this.momentoService = momentoService;
         this.questaoService = questaoService;
+        this.escalaService = escalaService;
     }
 
 
@@ -179,6 +179,46 @@ public class DocenteController {
         throw new NoDocenteException(momentoRequest.getDocenteNumero());
     }
 
+    //-------------------------------------------//
+    //              ESCALA RELATED              //
+    //-------------------------------------------//
+
+
+
+
+    @PostMapping(value = "/escala", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Escala> createEscala(@RequestBody EscalaRequest escalaRequest){
+        this.logger.info("Create Escala Request");
+
+        Optional<Escala> escalaOptional=this.escalaService.createEscala(escalaRequest.getCadeiraNome(), escalaRequest.getEscala());
+        if(escalaOptional.isPresent()){
+            return ResponseEntity.ok(escalaOptional.get());
+        }
+        throw new EscalaAlreadyExistsException(escalaRequest.getEscala().getDesignation());
+    }
+
+    @RequestMapping(value = "/escala", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteEscala(@RequestBody EscalaRequest escalaRequest) throws NoEscalaException {
+        this.logger.info("Delete Escala Request");
+
+        Boolean deleted = this.escalaService.deleteEscala(escalaRequest);
+        if(deleted) {
+            return ResponseEntity.ok("Deleted escala " + escalaRequest.getEscala().getDesignation());
+        }
+        throw new DocenteController.NoEscalaException(escalaRequest.getDesignation());
+    }
+
+    @RequestMapping(value = "/escala", method = RequestMethod.PUT)
+    public ResponseEntity<Escala> updateEscala(@RequestBody EscalaRequest escalaRequest){
+        this.logger.info("Update Request for escala");
+
+        Optional<Escala> optionalEscala =this.escalaService.updateEscala(escalaRequest);
+        if(optionalEscala.isPresent()) {
+            return ResponseEntity.ok(optionalEscala.get());
+        }
+        throw new NoEscalaException(escalaRequest.getDesignation());
+    }
+
 
 
     //-------------------------------------------//
@@ -250,6 +290,21 @@ public class DocenteController {
     private static class NoMomentoException extends RuntimeException{
         private NoMomentoException(String nome){
             super("Momento " + nome + " não existente");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Escala já existente")
+    private static class EscalaAlreadyExistsException extends RuntimeException {
+
+        public EscalaAlreadyExistsException(String name) {
+            super("Escala com nome: " + name + " já existe");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.NOT_FOUND, reason = "Escala não existente")
+    private static class NoEscalaException extends RuntimeException{
+        private NoEscalaException(String nome){
+            super("Escala " + nome + " não existente");
         }
     }
 

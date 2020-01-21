@@ -202,18 +202,18 @@ public class CadeiraController {
         }
         throw new NoCriterioExcpetion(designation);
     }
-
+/**
     @RequestMapping(value = "/{cadeira}/criterios/{designation}", method = RequestMethod.PUT)
     public ResponseEntity<Escala>editCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation, @RequestBody Escala escala) throws NoCriterioExcpetion{
         this.logger.info("Update Request for escala " + designation + " of " + cadeira);
 
-        Optional<Escala> optionalCriterio =this.escalaService.updateCriterio(cadeira, designation, escala);
+        Optional<Escala> optionalCriterio =this.escalaService.updateEscala(cadeira, designation, escala);
         if(optionalCriterio.isPresent()) {
             return ResponseEntity.ok(optionalCriterio.get());
         }
         throw new NoCriterioExcpetion(designation);
     }
-
+**/
     @RequestMapping(value = "/{cadeira}/criterios/", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteAllCriterios(@PathVariable("cadeira") String cadeira){
         this.logger.info("Delete Request for every escala of " + cadeira);
@@ -221,23 +221,23 @@ public class CadeiraController {
         escalaService.deleteAll(cadeira);
         return ResponseEntity.ok("Deleted every escala from " + cadeira);
     }
-
+/**
     @RequestMapping(value = "/{cadeira}/criterios/{designation}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation) throws NoCriterioExcpetion{
         this.logger.info("Delete Request for escala " + designation + " from " + cadeira);
 
-        Boolean deleted = this.escalaService.deleteCriterio(cadeira, designation);
+        Boolean deleted = this.escalaService.deleteEscala(cadeira, designation);
         if(deleted) {
             return ResponseEntity.ok("Delete escala " + designation);
         }
         throw new NoCriterioExcpetion(designation);
     }
-
+**/
     @PostMapping(value = "/{cadeira}/criterios", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Escala> createCriterio(@PathVariable("cadeira") String cadeira, @RequestBody Escala escala){
         this.logger.info("Create Escala Request for " + cadeira);
 
-        Optional<Escala> criterioOptional=this.escalaService.createCriterio(cadeira, escala);
+        Optional<Escala> criterioOptional=this.escalaService.createEscala(cadeira, escala);
         if(criterioOptional.isPresent()){
             return ResponseEntity.ok(criterioOptional.get());
         }

@@ -77,4 +77,19 @@ public class Cadeira {
         }
         return true;
     }
+
+    public void addEscala(Escala escala) {
+        if (addCheckEscala(escala)){
+            escalas.add(escala);
+        }
+    }
+
+    private boolean addCheckEscala(Escala escala) {
+        for (Escala e: escalas) {
+            if(e.getDesignation().equals(escala.getDesignation())){
+                return false;
+            }
+        }
+        return true;
+    }
 }

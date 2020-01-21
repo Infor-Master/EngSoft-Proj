@@ -161,7 +161,6 @@ public class DocenteController {
     public ResponseEntity<String> deleteMomento(@RequestBody MomentoRequest momentoRequest) throws NoMomentoException {
         this.logger.info("Delete Momento Request");
 
-        //Boolean deleted = this.momentoService.deleteMomento(cadeira,ano,comp,nome);
         Boolean deleted = this.momentoService.deleteMomento(momentoRequest);
         if(deleted) {
             return ResponseEntity.ok("Deleted momento " + momentoRequest.getMomento().getDesignation());

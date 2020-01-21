@@ -139,24 +139,6 @@ public class MomentoService {
         return Optional.empty();
     }
 
-    public Optional<Componente> findComponenteByType(String cadeira, int ano, String type) {
-        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
-        Optional<Componente> optionalComponente = Optional.empty();
-        if (optionalCadeira.isPresent()){
-            for (Oferta o : optionalCadeira.get().getOfertas()) {
-                if (o.getAno() == ano){
-                    for (Componente c : o.getComponentes()) {
-                        if (c.getType().compareTo(type) == 0){
-                            optionalComponente = Optional.of(c);
-                            return optionalComponente;
-                        }
-                    }
-                }
-            }
-        }
-        return optionalComponente;
-    }
-
     public Optional<Momento> updateMomento(MomentoRequest momentoRequest){
         if (momentoRequest.getMomento() == null ||
                 momentoRequest.getAno() <= 0 ||
@@ -204,6 +186,24 @@ public class MomentoService {
             }
         }
         return Optional.empty();
+    }
+
+    public Optional<Componente> findComponenteByType(String cadeira, int ano, String type) {
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
+        Optional<Componente> optionalComponente = Optional.empty();
+        if (optionalCadeira.isPresent()){
+            for (Oferta o : optionalCadeira.get().getOfertas()) {
+                if (o.getAno() == ano){
+                    for (Componente c : o.getComponentes()) {
+                        if (c.getType().compareTo(type) == 0){
+                            optionalComponente = Optional.of(c);
+                            return optionalComponente;
+                        }
+                    }
+                }
+            }
+        }
+        return optionalComponente;
     }
 }
 

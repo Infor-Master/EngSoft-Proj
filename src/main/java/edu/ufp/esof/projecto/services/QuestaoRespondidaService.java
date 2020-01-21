@@ -13,13 +13,13 @@ import java.util.Set;
 public class QuestaoRespondidaService {
 
     private QuestaoRespondidaRepo questaoRespondidaRepo;
-    private CriterioService criterioService;
+    private EscalaService escalaService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public QuestaoRespondidaService(QuestaoRespondidaRepo questaoRespondidaRepo, CriterioService criterioService) {
+    public QuestaoRespondidaService(QuestaoRespondidaRepo questaoRespondidaRepo, EscalaService escalaService) {
         this.questaoRespondidaRepo = questaoRespondidaRepo;
-        this.criterioService = criterioService;
+        this.escalaService = escalaService;
     }
 
     public Set<QuestaoRespondida> findAll(){
@@ -65,7 +65,7 @@ public class QuestaoRespondidaService {
             qr.setMomento(null);
         }
         if (qr.getEscala() != null){
-            criterioService.delete(qr.getEscala());
+            escalaService.delete(qr.getEscala());
             qr.setEscala(null);
         }
         questaoRespondidaRepo.delete(qr);

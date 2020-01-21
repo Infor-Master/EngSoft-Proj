@@ -17,14 +17,14 @@ public class CadeiraService {
     private CadeiraRepo cadeiraRepo;
     private FilterCadeiraService filterService;
     private OfertaService ofertaService;
-    private CriterioService criterioService;
+    private EscalaService escalaService;
 
     @Autowired
-    public CadeiraService(CadeiraRepo cadeiraRepo, FilterCadeiraService filterService, OfertaService ofertaService, CriterioService criterioService) {
+    public CadeiraService(CadeiraRepo cadeiraRepo, FilterCadeiraService filterService, OfertaService ofertaService, EscalaService escalaService) {
         this.cadeiraRepo = cadeiraRepo;
         this.filterService=filterService;
         this.ofertaService = ofertaService;
-        this.criterioService = criterioService;
+        this.escalaService = escalaService;
     }
 
     public Set<Cadeira> filterCadeira(Map<String, String> searchParams){
@@ -121,7 +121,7 @@ public class CadeiraService {
             Iterator<Escala> criterios = c.getEscalas().iterator();
             Escala cr = criterios.next();
             c.getEscalas().remove(cr);
-            criterioService.delete(cr);
+            escalaService.delete(cr);
         }
         cadeiraRepo.delete(c);
     }

@@ -2,6 +2,8 @@ package edu.ufp.esof.projecto.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ufp.esof.projecto.models.*;
+import edu.ufp.esof.projecto.models.builders.ComponenteBuilder;
+import edu.ufp.esof.projecto.models.builders.MomentoBuilder;
 import edu.ufp.esof.projecto.services.DocenteService;
 import edu.ufp.esof.projecto.services.MomentoService;
 import edu.ufp.esof.projecto.services.QuestaoService;
@@ -144,14 +146,6 @@ class DocenteControllerTest {
     }
 
     @Test
-    void deleteAllDocentes() {
-    }
-
-    @Test
-    void deleteDocente() {
-    }
-
-    @Test
     void createDocente() throws Exception {
         Docente docente=new Docente("docente", "123");
         when(docenteService.createDocente(docente)).thenReturn(Optional.of(docente));
@@ -171,6 +165,26 @@ class DocenteControllerTest {
     }
 
     @Test
+    void deleteAllDocentes() throws Exception {
+        this.mockMvc.perform(
+                delete("/docente")
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteDocente() throws Exception {
+        Docente docente = new Docente("docente", "123");
+        when(this.docenteService.deleteDocente("123")).thenReturn(true);
+        this.mockMvc.perform(
+                delete("/docente/123").contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpect(status().isOk());
+
+        this.mockMvc.perform(
+                delete("/docente/1234").contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpect(status().isNotFound());
+    }
+
+    @Test
     void associateDocenteComponente() {
     }
 
@@ -179,12 +193,37 @@ class DocenteControllerTest {
     }
 
     @Test
-    void createMomento() {
-        
+    void createMomento() throws Exception {
+        Cadeira cadeira = new Cadeira("Engenharia de Software", "111");
+        Oferta oferta= new Oferta(2020, cadeira);
+        Docente docente=new Docente("docente", "123");
+        Componente componente = new ComponenteBuilder().setDocente(docente).setOferta(oferta).setType("pratica").build();
+        Momento momento = new MomentoBuilder().setComponente(componente).setPeso(0.2F).setDesignation("TesteR").build();
+
+        when(momentoService.createMomento(docente.getCode(), cadeira.getDesignation(), oferta.getAno(), componente.getType(), momento)).thenReturn(Optional.of(momento));
+        String jsonRequest="{\"docenteNumero\": \"123\",\"cadeiraNome\": \"Engenharia de Software\",\"ano\": 2020,\"comp\": \"pratica\",\"momento\": {\"designation\": \"testeR\", \"peso\": 0.2}}";
+
+        this.mockMvc.perform(
+                post("/docente/momento").contentType(MediaType.APPLICATION_JSON).content(jsonRequest)
+        ).andExpect(status().is(400));
+
+        when(momentoService.createMomento(docente.getCode(), cadeira.getDesignation(), oferta.getAno(), componente.getType(), momento)).thenReturn(Optional.empty());
+        String BADjsonRequest= "{\"docenteNumero\": \"123\",\"cadeiraNome\": \"Engenharia de Software\",\"ano\": 2020,\"comp\": \"pratica\",\"momento\": {\"designation\": \"testeR\", \"peso\": 0.2}}";
+        this.mockMvc.perform(
+                post("/docente/momento").contentType(MediaType.APPLICATION_JSON).content(BADjsonRequest)
+        ).andExpect(status().isBadRequest());
 
     }
 
     @Test
     void deleteMomento() {
+    }
+
+    @Test
+    void createQuest() {
+    }
+
+    @Test
+    void deleteQuestao() {
     }
 }

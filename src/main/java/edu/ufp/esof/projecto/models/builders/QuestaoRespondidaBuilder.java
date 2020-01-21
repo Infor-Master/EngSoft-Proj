@@ -1,6 +1,6 @@
 package edu.ufp.esof.projecto.models.builders;
 
-import edu.ufp.esof.projecto.models.Criterio;
+import edu.ufp.esof.projecto.models.Escala;
 import edu.ufp.esof.projecto.models.MomentoRealizado;
 import edu.ufp.esof.projecto.models.Questao;
 import edu.ufp.esof.projecto.models.QuestaoRespondida;
@@ -8,7 +8,7 @@ import edu.ufp.esof.projecto.models.QuestaoRespondida;
 public class QuestaoRespondidaBuilder {
 
     private MomentoRealizado momento;
-    private Criterio criterio;
+    private Escala escala;
     private Questao questao;
 
     public QuestaoRespondidaBuilder setMomento(MomentoRealizado momento) {
@@ -16,8 +16,8 @@ public class QuestaoRespondidaBuilder {
         return this;
     }
 
-    public QuestaoRespondidaBuilder setCriterio(Criterio criterio) {
-        this.criterio = criterio;
+    public QuestaoRespondidaBuilder setEscala(Escala escala) {
+        this.escala = escala;
         return this;
     }
 
@@ -27,6 +27,6 @@ public class QuestaoRespondidaBuilder {
     }
 
     public QuestaoRespondida build(){
-        return new QuestaoRespondida(momento,criterio,questao);
+        return new QuestaoRespondida(momento, escala,questao);
     }
 }

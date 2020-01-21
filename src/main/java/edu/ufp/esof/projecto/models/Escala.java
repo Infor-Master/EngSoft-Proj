@@ -12,7 +12,7 @@ import javax.persistence.*;
         generator= ObjectIdGenerators.PropertyGenerator.class,
         property="id")
 @NoArgsConstructor
-public class Criterio {
+public class Escala {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class Criterio {
     private String designation;
     private Float nota;
 
-    public Criterio(String designation, Float nota){
+    public Escala(String designation, Float nota){
         this.setDesignation(designation);
         this.setNota(nota);
     }

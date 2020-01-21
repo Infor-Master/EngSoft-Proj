@@ -1,7 +1,7 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Cadeira;
-import edu.ufp.esof.projecto.models.Criterio;
+import edu.ufp.esof.projecto.models.Escala;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.CriterioRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,20 +25,20 @@ public class CriterioService {
         this.cadeiraRepo = cadeiraRepo;
     }
 
-    public Set<Criterio> findAll(String cadeira) {
+    public Set<Escala> findAll(String cadeira) {
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
-        Set<Criterio> criterios=new HashSet<>();
+        Set<Escala> escalas =new HashSet<>();
         if (optionalCadeira.isPresent()){
-            for(Criterio c: optionalCadeira.get().getCriterios()){
-                criterios.add(c);
+            for(Escala c: optionalCadeira.get().getEscalas()){
+                escalas.add(c);
             }
         }
-        return criterios;
+        return escalas;
     }
 
-    public Optional<Criterio> findByDesignation(String cadeira, String designation) {
-        Set<Criterio> criterios = findAll(cadeira);
-        for (Criterio c : criterios) {
+    public Optional<Escala> findByDesignation(String cadeira, String designation) {
+        Set<Escala> escalas = findAll(cadeira);
+        for (Escala c : escalas) {
             if (c.getDesignation().compareTo(designation) == 0){
                 return Optional.of(c);
             }
@@ -46,27 +46,27 @@ public class CriterioService {
         return Optional.empty();
     }
 
-    public Optional<Criterio> createCriterio(String cadeira, Criterio criterio) {
+    public Optional<Escala> createCriterio(String cadeira, Escala escala) {
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if (optionalCadeira.isPresent()){
-            for (Criterio c : optionalCadeira.get().getCriterios()) {
-                if (c.getDesignation().compareTo(criterio.getDesignation())==0){
+            for (Escala c : optionalCadeira.get().getEscalas()) {
+                if (c.getDesignation().compareTo(escala.getDesignation())==0){
                     return Optional.empty();
                 }
             }
-            optionalCadeira.get().getCriterios().add(criterio);
-            this.criterioRepo.save(criterio);
-            return Optional.of(criterio);
+            optionalCadeira.get().getEscalas().add(escala);
+            this.criterioRepo.save(escala);
+            return Optional.of(escala);
         }
         return Optional.empty();
     }
 
-    public Optional<Criterio> updateCriterio(String cadeira, String designation, Criterio criterio){
+    public Optional<Escala> updateCriterio(String cadeira, String designation, Escala escala){
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if (optionalCadeira.isPresent()){
-            for (Criterio c : optionalCadeira.get().getCriterios()) {
+            for (Escala c : optionalCadeira.get().getEscalas()) {
                 if (c.getDesignation().compareTo(designation)==0){
-                    return update(optionalCadeira.get(),c,criterio);
+                    return update(optionalCadeira.get(),c, escala);
                 }
             }
         }
@@ -74,10 +74,10 @@ public class CriterioService {
     }
 
 
-    public Optional<Criterio> update(Cadeira c, Criterio old, Criterio newCr){
+    public Optional<Escala> update(Cadeira c, Escala old, Escala newCr){
         Boolean check = true;
         if (newCr.getDesignation() != null && old.getDesignation().compareTo(newCr.getDesignation()) != 0){
-            for (Criterio cr : c.getCriterios()) {
+            for (Escala cr : c.getEscalas()) {
                 if(cr.getDesignation().compareTo(newCr.getDesignation()) == 0){
                     check=false;
                     break;
@@ -89,7 +89,7 @@ public class CriterioService {
             check = true;
         }
         if (newCr.getNota() != old.getNota()){
-            for (Criterio cr : c.getCriterios()) {
+            for (Escala cr : c.getEscalas()) {
                 if (cr.getNota() == newCr.getNota()){
                     check = false;
                     break;
@@ -106,9 +106,9 @@ public class CriterioService {
     public Boolean deleteCriterio(String cadeira, String designation){
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if (optionalCadeira.isPresent()){
-            for (Criterio c : optionalCadeira.get().getCriterios()) {
+            for (Escala c : optionalCadeira.get().getEscalas()) {
                 if (c.getDesignation().compareTo(designation) == 0){
-                    optionalCadeira.get().getCriterios().remove(c);
+                    optionalCadeira.get().getEscalas().remove(c);
                     criterioRepo.delete(c);
                     return true;
                 }
@@ -120,16 +120,16 @@ public class CriterioService {
     public void deleteAll(String cadeira){
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if(optionalCadeira.isPresent()){
-            while(!optionalCadeira.get().getCriterios().isEmpty()){
-                Iterator<Criterio> criterios = optionalCadeira.get().getCriterios().iterator();
-                Criterio c=criterios.next();
-                optionalCadeira.get().getCriterios().remove(c);
+            while(!optionalCadeira.get().getEscalas().isEmpty()){
+                Iterator<Escala> criterios = optionalCadeira.get().getEscalas().iterator();
+                Escala c=criterios.next();
+                optionalCadeira.get().getEscalas().remove(c);
                 criterioRepo.delete(c);
             }
         }
     }
 
-    public void delete(Criterio c){
+    public void delete(Escala c){
         criterioRepo.delete(c);
     }
 }

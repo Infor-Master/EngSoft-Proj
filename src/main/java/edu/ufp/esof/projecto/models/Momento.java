@@ -2,9 +2,6 @@ package edu.ufp.esof.projecto.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import edu.ufp.esof.projecto.models.builders.MomentoRealizadoBuilder;
-import edu.ufp.esof.projecto.models.builders.QuestaoBuilder;
-import edu.ufp.esof.projecto.models.builders.QuestaoRespondidaBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,7 +24,7 @@ public class Momento {
     private Long id;
 
     private String designation;
-    private Float peso;
+    private Float pesoAvaliacao;
 
     @ManyToOne
     @ToString.Exclude
@@ -43,9 +40,9 @@ public class Momento {
         this.setDesignation(designation);
     }
 
-    public Momento(String designation, Float peso, Componente componente, Set<Questao> questoes) {
+    public Momento(String designation, Float pesoAvaliacao, Componente componente, Set<Questao> questoes) {
         this.designation = designation;
-        this.peso = peso;
+        this.pesoAvaliacao = pesoAvaliacao;
         this.componente = componente;
         componente.getMomentos().add(this);
         this.questoes = questoes;

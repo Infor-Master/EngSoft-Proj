@@ -140,16 +140,16 @@ public class AlunoService {
         return Optional.empty();
     }
 
-    public Optional<Criterio> notasRaCadeira(String id, String cadeira, int ano, String componente){
+    public Optional<Escala> notasRaCadeira(String id, String cadeira, int ano, String componente){
         Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
         Optional<Componente> optionalComponente = componenteService.findByType(cadeira,ano,componente);
         if (optionalAluno.isPresent() && optionalComponente.isPresent() && optionalComponente.get().getAlunos().contains(optionalAluno.get())){
-            Set<Criterio> notas = new HashSet<>();
+            Set<Escala> notas = new HashSet<>();
             for (Aluno a : optionalComponente.get().getAlunos()) {
                 if (a.getId() == optionalAluno.get().getId()){
                     for (MomentoRealizado mr : a.getMomentos()) {
                         if (mr.getMomento().getComponente().getId() == optionalComponente.get().getId()){
-                            Criterio cr = new Criterio(mr.getMomento().getComponente().getOferta().getCadeira().getDesignation() + " - " + mr.getMomento().getDesignation(), 0.0f);
+                            Escala cr = new Escala(mr.getMomento().getComponente().getOferta().getCadeira().getDesignation() + " - " + mr.getMomento().getDesignation(), 0.0f);
                             cr.setNota(mr.notaRa());
                             return Optional.of(cr);
                         }
@@ -160,12 +160,12 @@ public class AlunoService {
         return Optional.empty();
     }
 
-    public Optional<Set<Criterio>> notasRa(String id){
+    public Optional<Set<Escala>> notasRa(String id){
         Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
         if (optionalAluno.isPresent()){
-            Set<Criterio> notas = new HashSet<>();
+            Set<Escala> notas = new HashSet<>();
             for (Componente c : optionalAluno.get().getComponentes()) {
-                Optional<Criterio> optionalCriterio = notasRaCadeira(id,
+                Optional<Escala> optionalCriterio = notasRaCadeira(id,
                         c.getOferta().getCadeira().getDesignation(),
                         c.getOferta().getAno(),
                         c.getType());
@@ -178,16 +178,16 @@ public class AlunoService {
         return Optional.empty();
     }
 
-    public Optional<Criterio> notasCadeira(String id, String cadeira, int ano, String componente){
+    public Optional<Escala> notasCadeira(String id, String cadeira, int ano, String componente){
         Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
         Optional<Componente> optionalComponente = componenteService.findByType(cadeira,ano,componente);
         if (optionalAluno.isPresent() && optionalComponente.isPresent() && optionalComponente.get().getAlunos().contains(optionalAluno.get())){
-            Set<Criterio> notas = new HashSet<>();
+            Set<Escala> notas = new HashSet<>();
             for (Aluno a : optionalComponente.get().getAlunos()) {
                 if (a.getId() == optionalAluno.get().getId()){
                     for (MomentoRealizado mr : a.getMomentos()) {
                         if (mr.getMomento().getComponente().getId() == optionalComponente.get().getId()){
-                            Criterio cr = new Criterio(mr.getMomento().getComponente().getOferta().getCadeira().getDesignation() + " - " + mr.getMomento().getDesignation(), 0.0f);
+                            Escala cr = new Escala(mr.getMomento().getComponente().getOferta().getCadeira().getDesignation() + " - " + mr.getMomento().getDesignation(), 0.0f);
                             cr.setNota(mr.nota());
                             return Optional.of(cr);
                         }
@@ -198,12 +198,12 @@ public class AlunoService {
         return Optional.empty();
     }
 
-    public Optional<Set<Criterio>> notas(String id){
+    public Optional<Set<Escala>> notas(String id){
         Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
         if (optionalAluno.isPresent()){
-            Set<Criterio> notas = new HashSet<>();
+            Set<Escala> notas = new HashSet<>();
             for (Componente c : optionalAluno.get().getComponentes()) {
-                Optional<Criterio> optionalCriterio = notasCadeira(id,
+                Optional<Escala> optionalCriterio = notasCadeira(id,
                         c.getOferta().getCadeira().getDesignation(),
                         c.getOferta().getAno(),
                         c.getType());
@@ -254,8 +254,8 @@ public class AlunoService {
                     while(!mr.getQuestoes().isEmpty()){
                         Iterator<QuestaoRespondida> questoes = mr.getQuestoes().iterator();
                         QuestaoRespondida qr = questoes.next();
-                        criterioRepo.delete(qr.getCriterio());
-                        qr.setCriterio(null);
+                        criterioRepo.delete(qr.getEscala());
+                        qr.setEscala(null);
                         mr.getQuestoes().remove(qr);
                         qr.setMomento(null);
                         qr.setQuestao(null);

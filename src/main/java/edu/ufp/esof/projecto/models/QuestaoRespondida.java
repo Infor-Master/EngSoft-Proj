@@ -29,7 +29,7 @@ public class QuestaoRespondida {
 
     @OneToOne
     //@JsonManagedReference
-    private Criterio criterio;
+    private Escala escala;
 
     @OneToOne
     //@JsonManagedReference
@@ -39,10 +39,10 @@ public class QuestaoRespondida {
         this.setQuestao(questao);
     }
 
-    public QuestaoRespondida(MomentoRealizado momento, Criterio criterio, Questao questao) {
+    public QuestaoRespondida(MomentoRealizado momento, Escala escala, Questao questao) {
         this.momento = momento;
         momento.getQuestoes().add(this);
-        this.criterio = criterio;
+        this.escala = escala;
         this.questao = questao;
     }
 }

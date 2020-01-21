@@ -170,10 +170,10 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
         //ofertaRepo.save(oferta1);
         //componenteRepo.save(componente1);
-        Criterio criterio1 = new Criterio("A", 20.0f);
-        Criterio criterio2 = new Criterio("B", 16.0f);
-        cadeira1.getCriterios().add(criterio1);
-        cadeira1.getCriterios().add(criterio2);
+        Escala criterio1 = new Escala("A", 20.0f);
+        Escala criterio2 = new Escala("B", 16.0f);
+        cadeira1.getEscalas().add(criterio1);
+        cadeira1.getEscalas().add(criterio2);
         criterioRepo.save(criterio1);
         criterioRepo.save(criterio2);
         //ofertaRepo.save(oferta1);

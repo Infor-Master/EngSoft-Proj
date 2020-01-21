@@ -1,7 +1,7 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Cadeira;
-import edu.ufp.esof.projecto.models.Criterio;
+import edu.ufp.esof.projecto.models.Escala;
 import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.services.filters.Cadeira.FilterCadeiraObject;
@@ -117,10 +117,10 @@ public class CadeiraService {
             Oferta o = ofertas.next();
             ofertaService.delete(o);
         }
-        while(!c.getCriterios().isEmpty()){
-            Iterator<Criterio> criterios = c.getCriterios().iterator();
-            Criterio cr = criterios.next();
-            c.getCriterios().remove(cr);
+        while(!c.getEscalas().isEmpty()){
+            Iterator<Escala> criterios = c.getEscalas().iterator();
+            Escala cr = criterios.next();
+            c.getEscalas().remove(cr);
             criterioService.delete(cr);
         }
         cadeiraRepo.delete(c);

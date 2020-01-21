@@ -1,14 +1,12 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.*;
-import edu.ufp.esof.projecto.models.builders.MomentoBuilder;
 import edu.ufp.esof.projecto.models.builders.MomentoRealizadoBuilder;
 import edu.ufp.esof.projecto.models.builders.QuestaoRespondidaBuilder;
 import edu.ufp.esof.projecto.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
@@ -102,7 +100,7 @@ public class MomentoService {
     }
 
     public Optional<Momento> createMomento(String id, String cadeira, int ano, String comp, Momento momento){
-        if (momento.getDesignation() == null || momento.getPeso()<=0){
+        if (momento.getDesignation() == null || momento.getPesoAvaliacao()<=0){
             return Optional.empty();
         }
         Float pesoMomento = 0.0f;
@@ -121,7 +119,7 @@ public class MomentoService {
                 Float peso = 0.0f;
                 Componente componente=optionalComponente.get();
                 for (Momento m : componente.getMomentos()) {
-                    peso = peso + m.getPeso();
+                    peso = peso + m.getPesoAvaliacao();
                     if (m.getDesignation().equals(momento.getDesignation()) || peso>=1.0f){
                         return Optional.empty();
                     }
@@ -189,14 +187,14 @@ public class MomentoService {
                                 m.setDesignation(upMomento.getDesignation());
                             }
                         }
-                        if (upMomento.getPeso() != null && upMomento.getPeso() != 0.0f){
+                        if (upMomento.getPesoAvaliacao() != null && upMomento.getPesoAvaliacao() != 0.0f){
                             Float peso = 0.0f;
                             for (Momento aux:componente.getMomentos()) {
-                                peso+=aux.getPeso();
+                                peso+=aux.getPesoAvaliacao();
                             }
-                            peso-=m.getPeso();
-                            if (upMomento.getPeso()<= (1-peso)){
-                                m.setPeso(upMomento.getPeso());
+                            peso-=m.getPesoAvaliacao();
+                            if (upMomento.getPesoAvaliacao()<= (1-peso)){
+                                m.setPesoAvaliacao(upMomento.getPesoAvaliacao());
                             }
                         }
                         momentoRepo.save(m);

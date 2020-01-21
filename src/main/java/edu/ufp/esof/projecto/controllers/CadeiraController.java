@@ -2,7 +2,7 @@ package edu.ufp.esof.projecto.controllers;
 
 import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Componente;
-import edu.ufp.esof.projecto.models.Criterio;
+import edu.ufp.esof.projecto.models.Escala;
 import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.services.CadeiraService;
 import edu.ufp.esof.projecto.services.ComponenteService;
@@ -186,17 +186,17 @@ public class CadeiraController {
 
 
     @RequestMapping(value = "/{cadeira}/criterios", method = RequestMethod.GET)
-    public ResponseEntity<Iterable<Criterio>> getAllCriterios(@PathVariable("cadeira") String cadeira){
-        this.logger.info("Listing Request for criterios");
+    public ResponseEntity<Iterable<Escala>> getAllCriterios(@PathVariable("cadeira") String cadeira){
+        this.logger.info("Listing Request for escalas");
 
         return ResponseEntity.ok(this.criterioService.findAll(cadeira));
     }
 
     @RequestMapping(value = "/{cadeira}/criterios/{designation}",method = RequestMethod.GET)
-    public ResponseEntity<Criterio> getCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation) throws NoCriterioExcpetion {
-        this.logger.info("Listing Request for criterio " + designation + " of " + cadeira);
+    public ResponseEntity<Escala> getCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation) throws NoCriterioExcpetion {
+        this.logger.info("Listing Request for escala " + designation + " of " + cadeira);
 
-        Optional<Criterio> optionalCriterio =this.criterioService.findByDesignation(cadeira, designation);
+        Optional<Escala> optionalCriterio =this.criterioService.findByDesignation(cadeira, designation);
         if(optionalCriterio.isPresent()) {
             return ResponseEntity.ok(optionalCriterio.get());
         }
@@ -204,10 +204,10 @@ public class CadeiraController {
     }
 
     @RequestMapping(value = "/{cadeira}/criterios/{designation}", method = RequestMethod.PUT)
-    public ResponseEntity<Criterio>editCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation, @RequestBody Criterio criterio) throws NoCriterioExcpetion{
-        this.logger.info("Update Request for criterio " + designation + " of " + cadeira);
+    public ResponseEntity<Escala>editCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation, @RequestBody Escala escala) throws NoCriterioExcpetion{
+        this.logger.info("Update Request for escala " + designation + " of " + cadeira);
 
-        Optional<Criterio> optionalCriterio =this.criterioService.updateCriterio(cadeira, designation, criterio);
+        Optional<Escala> optionalCriterio =this.criterioService.updateCriterio(cadeira, designation, escala);
         if(optionalCriterio.isPresent()) {
             return ResponseEntity.ok(optionalCriterio.get());
         }
@@ -216,32 +216,32 @@ public class CadeiraController {
 
     @RequestMapping(value = "/{cadeira}/criterios/", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteAllCriterios(@PathVariable("cadeira") String cadeira){
-        this.logger.info("Delete Request for every criterio of " + cadeira);
+        this.logger.info("Delete Request for every escala of " + cadeira);
 
         criterioService.deleteAll(cadeira);
-        return ResponseEntity.ok("Deleted every criterio from " + cadeira);
+        return ResponseEntity.ok("Deleted every escala from " + cadeira);
     }
 
     @RequestMapping(value = "/{cadeira}/criterios/{designation}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteCriterio(@PathVariable("cadeira") String cadeira, @PathVariable("designation") String designation) throws NoCriterioExcpetion{
-        this.logger.info("Delete Request for criterio " + designation + " from " + cadeira);
+        this.logger.info("Delete Request for escala " + designation + " from " + cadeira);
 
         Boolean deleted = this.criterioService.deleteCriterio(cadeira, designation);
         if(deleted) {
-            return ResponseEntity.ok("Delete criterio " + designation);
+            return ResponseEntity.ok("Delete escala " + designation);
         }
         throw new NoCriterioExcpetion(designation);
     }
 
     @PostMapping(value = "/{cadeira}/criterios", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Criterio> createCriterio(@PathVariable("cadeira") String cadeira, @RequestBody Criterio criterio){
-        this.logger.info("Create Criterio Request for " + cadeira);
+    public ResponseEntity<Escala> createCriterio(@PathVariable("cadeira") String cadeira, @RequestBody Escala escala){
+        this.logger.info("Create Escala Request for " + cadeira);
 
-        Optional<Criterio> criterioOptional=this.criterioService.createCriterio(cadeira, criterio);
+        Optional<Escala> criterioOptional=this.criterioService.createCriterio(cadeira, escala);
         if(criterioOptional.isPresent()){
             return ResponseEntity.ok(criterioOptional.get());
         }
-        throw new CriterioAlreadyExistsExcpetion(criterio.getDesignation());
+        throw new CriterioAlreadyExistsExcpetion(escala.getDesignation());
     }
 
 
@@ -362,19 +362,19 @@ public class CadeiraController {
         }
     }
 
-    @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Criterio não existente")
+    @ResponseStatus(value= HttpStatus.NOT_FOUND, reason="Escala não existente")
     private static class NoCriterioExcpetion extends RuntimeException {
 
         private NoCriterioExcpetion(String designation) {
-            super("Criterio " + designation + " nao existente");
+            super("Escala " + designation + " nao existente");
         }
     }
 
-    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Criterio já existente")
+    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Escala já existente")
     private static class CriterioAlreadyExistsExcpetion extends RuntimeException {
 
         public CriterioAlreadyExistsExcpetion(String designation) {
-            super("Criterio " + designation + " já existe");
+            super("Escala " + designation + " já existe");
         }
     }
 

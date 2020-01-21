@@ -3,7 +3,7 @@ package edu.ufp.esof.projecto.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Componente;
-import edu.ufp.esof.projecto.models.Criterio;
+import edu.ufp.esof.projecto.models.Escala;
 import edu.ufp.esof.projecto.models.Oferta;
 import edu.ufp.esof.projecto.services.CadeiraService;
 import edu.ufp.esof.projecto.services.ComponenteService;
@@ -283,16 +283,16 @@ class CadeiraControllerTest {
     @Test
     void getAllCriterios() throws Exception {
         Cadeira cadeira=new Cadeira("Teste","123");
-        Criterio criterio1=new Criterio("Insuficiente",1F);
-        Criterio criterio2=new Criterio("Bom", 2F);
-        Criterio criterio3=new Criterio("Excelente", 3F);
-        Set<Criterio> criterios=new HashSet<>();
-        criterios.add(criterio1);
-        criterios.add(criterio2);
-        criterios.add(criterio3);
-        when(this.criterioService.findAll("Teste")).thenReturn(criterios);
+        Escala escala1 =new Escala("Insuficiente",1F);
+        Escala escala2 =new Escala("Bom", 2F);
+        Escala escala3 =new Escala("Excelente", 3F);
+        Set<Escala> escalas =new HashSet<>();
+        escalas.add(escala1);
+        escalas.add(escala2);
+        escalas.add(escala3);
+        when(this.criterioService.findAll("Teste")).thenReturn(escalas);
         String responseJson=this.mockMvc.perform(
-                get("/cadeira/Teste/criterios")
+                get("/cadeira/Teste/escalas")
         ).andExpect(
                 status().isOk()
         ).andReturn().getResponse().getContentAsString();
@@ -301,10 +301,10 @@ class CadeiraControllerTest {
         for(int i=0; i<jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             String criteriojson = jsonObject.toString();
-            Criterio criterioresp = this.objectMapper.readValue(criteriojson, Criterio.class);
+            Escala criterioresp = this.objectMapper.readValue(criteriojson, Escala.class);
 
             boolean check=false;
-            if(criterios.contains(criterioresp)){
+            if(escalas.contains(criterioresp)){
                 check=true;
             }
             assertTrue(check);
@@ -314,16 +314,16 @@ class CadeiraControllerTest {
     @Test
     void getCriterio() throws Exception {
         Cadeira cadeira=new Cadeira("Teste","123");
-        Criterio criterio=new Criterio("bom", 10F);
-        when(this.criterioService.findByDesignation("Teste", "bom")).thenReturn(Optional.of(criterio));
+        Escala escala =new Escala("bom", 10F);
+        when(this.criterioService.findByDesignation("Teste", "bom")).thenReturn(Optional.of(escala));
         String responseJson=this.mockMvc.perform(
-                get("/cadeira/Teste/criterios/bom")
+                get("/cadeira/Teste/escalas/bom")
         ).andExpect(
                 status().isOk()
         ).andReturn().getResponse().getContentAsString();
 
         this.mockMvc.perform(
-                get("/cadeira/Teste/criterios/mau")
+                get("/cadeira/Teste/escalas/mau")
         ).andExpect(
                 status().isNotFound()
         );
@@ -332,20 +332,20 @@ class CadeiraControllerTest {
     @Test
     void editCriterio() throws Exception {
         Cadeira cadeira=new Cadeira("Teste","123");
-        Criterio criterio=new Criterio("bom", 10F);
-        Criterio criterio2=new Criterio("bom", 15F);
+        Escala escala =new Escala("bom", 10F);
+        Escala escala2 =new Escala("bom", 15F);
 
-        when(this.criterioService.updateCriterio("Teste","bom", criterio2)).thenReturn(Optional.of(criterio2));
-        String jsonRequest=this.objectMapper.writeValueAsString(criterio2);
+        when(this.criterioService.updateCriterio("Teste","bom", escala2)).thenReturn(Optional.of(escala2));
+        String jsonRequest=this.objectMapper.writeValueAsString(escala2);
         this.mockMvc.perform(
-                put("/cadeira/Teste/criterios/bom").contentType(MediaType.APPLICATION_JSON_VALUE)
+                put("/cadeira/Teste/escalas/bom").contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(MediaType.APPLICATION_JSON_VALUE)
                         .characterEncoding("UTF-8")
                         .content(jsonRequest)
         ).andExpect(status().isOk());
 
         this.mockMvc.perform(
-                put("/cadeira/Teste/criterios/mau").contentType(MediaType.APPLICATION_JSON_VALUE)
+                put("/cadeira/Teste/escalas/mau").contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(MediaType.APPLICATION_JSON_VALUE)
                         .characterEncoding("UTF-8")
                         .content(jsonRequest)
@@ -355,20 +355,20 @@ class CadeiraControllerTest {
     @Test
     void createCriterio() throws Exception {
         Cadeira cadeira=new Cadeira("Teste","123");
-        Criterio criterio=new Criterio("bom", 10F);
-        when(criterioService.createCriterio("Teste", criterio)).thenReturn(Optional.of(criterio));
-        String jsonRequest=this.objectMapper.writeValueAsString(criterio);
+        Escala escala =new Escala("bom", 10F);
+        when(criterioService.createCriterio("Teste", escala)).thenReturn(Optional.of(escala));
+        String jsonRequest=this.objectMapper.writeValueAsString(escala);
 
         this.mockMvc.perform(
-                post("/cadeira/Teste/criterios").contentType(MediaType.APPLICATION_JSON).content(jsonRequest)
+                post("/cadeira/Teste/escalas").contentType(MediaType.APPLICATION_JSON).content(jsonRequest)
         ).andExpect(status().isOk());
 
-        Criterio BADcriterio=new Criterio("bom", 99F);
+        Escala BADcriterio=new Escala("bom", 99F);
         when(criterioService.createCriterio("Teste", BADcriterio)).thenReturn(Optional.empty());
         String BADjsonRequest=this.objectMapper.writeValueAsString(BADcriterio);
 
         this.mockMvc.perform(
-                post("/cadeira/Teste/criterios").contentType(MediaType.APPLICATION_JSON).content(BADjsonRequest)
+                post("/cadeira/Teste/escalas").contentType(MediaType.APPLICATION_JSON).content(BADjsonRequest)
         ).andExpect(status().isBadRequest());
     }
 

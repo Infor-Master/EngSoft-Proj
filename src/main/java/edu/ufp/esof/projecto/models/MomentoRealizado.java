@@ -54,7 +54,7 @@ public class MomentoRealizado {
     public float notaRa(){
         float nota = 0.0f;
         for (QuestaoRespondida qr : questoes) {
-            nota += qr.getQuestao().getPesoRA()*qr.getCriterio().getNota();
+            nota += qr.getQuestao().getPesoRA()*qr.getEscala().getNota();
         }
         return nota;
     }
@@ -62,7 +62,7 @@ public class MomentoRealizado {
     public float nota(){
         float nota = 0.0f;
         for (QuestaoRespondida qr : questoes) {
-            nota += qr.getQuestao().getPesoMomento()*qr.getCriterio().getNota();
+            nota += qr.getQuestao().getPesoMomento()*qr.getEscala().getNota();
         }
         return nota;
     }

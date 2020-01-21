@@ -64,9 +64,9 @@ public class QuestaoRespondidaService {
             qr.getMomento().getQuestoes().remove(qr);
             qr.setMomento(null);
         }
-        if (qr.getCriterio() != null){
-            criterioService.delete(qr.getCriterio());
-            qr.setCriterio(null);
+        if (qr.getEscala() != null){
+            criterioService.delete(qr.getEscala());
+            qr.setEscala(null);
         }
         questaoRespondidaRepo.delete(qr);
     }
@@ -74,7 +74,7 @@ public class QuestaoRespondidaService {
     public void create(Questao q){
         for (Aluno a : q.getMomento().getComponente().getAlunos()) {
             QuestaoRespondida qr = new QuestaoRespondida(q);
-            qr.setCriterio(new Criterio("nota", 0.0f));
+            qr.setEscala(new Escala("nota", 0.0f));
             for (MomentoRealizado mr : a.getMomentos()) {
                 if (mr.getMomento().getId() == q.getMomento().getId()){
                     mr.getQuestoes().add(qr);

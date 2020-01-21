@@ -34,7 +34,7 @@ public class Cadeira {
 
     @OneToMany(cascade = CascadeType.PERSIST)
     //@JsonManagedReference
-    private Set<Criterio> criterios = new HashSet<>();
+    private Set<Escala> escalas = new HashSet<>();
 
     public Cadeira(String designation, String code){
         this.setDesignation(designation);

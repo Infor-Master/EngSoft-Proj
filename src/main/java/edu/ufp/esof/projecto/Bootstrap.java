@@ -55,48 +55,52 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         logger.debug("Startup");
 
-        Aluno aluno1 = new AlunoBuilder().setName("João").setCode("37190").build();
+ /*       Aluno aluno1 = new AlunoBuilder().setName("João").setCode("37190").build();
         //Aluno aluno1 = new Aluno("João", "37190");
         Aluno aluno2 = new Aluno("Luísa", "37151");
         Aluno aluno3 = new Aluno("Rodrigo", "36824");
         Aluno aluno4 = new Aluno("Inês", "36502");
-
+*/
         Cadeira cadeira1 = new Cadeira("Engenharia de Software", "1");
         Cadeira cadeira2 = new Cadeira("Redes de Computadores I", "2");
         Cadeira cadeira3 = new Cadeira("Base de Dados", "3");
         Cadeira cadeira4 = new Cadeira("Laboratório de Programação", "4");
-
         cadeiraRepo.save(cadeira1);
         cadeiraRepo.save(cadeira2);
         cadeiraRepo.save(cadeira3);
         cadeiraRepo.save(cadeira4);
+        Oferta oferta1 = new Oferta(2020,cadeira1);
+        Oferta oferta2 = new Oferta(2019,cadeira1);
+        ofertaRepo.save(oferta1);
+        ofertaRepo.save(oferta2);
+        cadeiraRepo.save(cadeira1);
+        Docente docente1 = new Docente("Prof", "123");
+        docenteRepo.save(docente1);
+        Componente componente1 = new ComponenteBuilder().setType("pratica").setOferta(oferta1).setDocente(docente1).build();
+        componenteRepo.save(componente1);
+        ofertaRepo.save(oferta1);
+        docenteRepo.save(docente1);
 
-
-        alunoRepo.save(aluno1);
+/*        alunoRepo.save(aluno1);
         alunoRepo.save(aluno2);
         alunoRepo.save(aluno3);
         alunoRepo.save(aluno4);
-        /*
+
         try {
             alunoRepo.save(aluno4);
         }catch (Exception e){
             logger.error(e.getMessage());
         }
-        */
+
         aluno1.setCode("18");
         alunoRepo.save(aluno1);
+*/
 
-        Oferta oferta1 = new Oferta(2020,cadeira1);
-        Oferta oferta2 = new Oferta(2019,cadeira1);
-        ofertaRepo.save(oferta1);
-        ofertaRepo.save(oferta2);
-        Docente docente1 = new Docente("Prof", "123");
-        docenteRepo.save(docente1);
+
         //Componente componente1 = new ComponenteBuilder().setType("pratica").setOferta(oferta1)
         //        .setDocente(docente1).addAluno(aluno1).addAluno(aluno2).addAluno(aluno3).build();
 
-        Componente componente1 = new ComponenteBuilder().setType("pratica").setOferta(oferta1)
-                .setDocente(docente1).build();
+
 
 
         /*componente1.getAlunos().add(aluno1);
@@ -106,13 +110,12 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         aluno2.getComponentes().add(componente1);
         aluno3.getComponentes().add(componente1);*/
         //Componente componente1 = new Componente("pratica", oferta1);
-        componenteRepo.save(componente1);
-        docenteRepo.save(docente1);
-        alunoRepo.save(aluno1);
+
+/*       alunoRepo.save(aluno1);
         alunoRepo.save(aluno2);
         alunoRepo.save(aluno3);
-
-        ResultadoAprendizagem ra1 = new RaBuilder().setDesignation("SQL").setOferta(oferta1).build();
+*/
+/*        ResultadoAprendizagem ra1 = new RaBuilder().setDesignation("SQL").setOferta(oferta1).build();
         resultadoAprendizagemRepo.save(ra1);
         ofertaRepo.save(oferta1);
         Momento momento1 = new MomentoBuilder().setComponente(componente1).setDesignation("teste1")
@@ -159,7 +162,7 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         cadeira1.addEscala(escala1);
         cadeira1.addEscala(escala2);
         cadeiraRepo.save(cadeira1);
-
+*/
         /*componente3.getAlunos().add(aluno1);
         componente3.getAlunos().add(aluno2);
         componente3.getAlunos().add(aluno3);

@@ -140,37 +140,42 @@ public class AlunoService {
         return Optional.empty();
     }
 
-    public Optional<Escala> notasRaCadeira(String id, String cadeira, int ano, String componente){
+    public Optional<Set<Escala>> notasRaCadeira(String id, String cadeira, int ano, String componente, int mode){
         Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
         Optional<Componente> optionalComponente = componenteService.findByType(cadeira,ano,componente);
         if (optionalAluno.isPresent() && optionalComponente.isPresent() && optionalComponente.get().getAlunos().contains(optionalAluno.get())){
             Set<Escala> notas = new HashSet<>();
-            for (Aluno a : optionalComponente.get().getAlunos()) {
-                if (a.getId() == optionalAluno.get().getId()){
-                    for (MomentoRealizado mr : a.getMomentos()) {
-                        if (mr.getMomento().getComponente().getId() == optionalComponente.get().getId()){
-                            Escala cr = new Escala(mr.getMomento().getComponente().getOferta().getCadeira().getDesignation() + " - " + mr.getMomento().getDesignation(), 0.0f);
-                            cr.setNota(mr.notaRa());
-                            return Optional.of(cr);
-                        }
+            for (ResultadoAprendizagem ra : optionalComponente.get().getOferta().getRas()) {
+                Escala e;
+                if (mode == 0){
+                    e = new Escala(ra.getDesignation(), 0.0f);
+                }
+                else {
+                    e = new Escala(cadeira + " - " + ra.getDesignation(), 0.0f);
+                }
+                float nota = 0.0f;
+                for (MomentoRealizado mr : optionalAluno.get().getMomentos()) {
+                    if (mr.getMomento().getComponente().getId() == optionalComponente.get().getId()){
+                        nota+=mr.notaRa(ra);
                     }
                 }
+                e.setNota(nota);
+                notas.add(e);
             }
+            return Optional.of(notas);
         }
         return Optional.empty();
     }
 
-    public Optional<Set<Escala>> notasRa(String id){
+    public Optional<Set<Set<Escala>>> notasRa(String id){
         Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
         if (optionalAluno.isPresent()){
-            Set<Escala> notas = new HashSet<>();
-            for (Componente c : optionalAluno.get().getComponentes()) {
-                Optional<Escala> optionalCriterio = notasRaCadeira(id,
-                        c.getOferta().getCadeira().getDesignation(),
-                        c.getOferta().getAno(),
-                        c.getType());
-                if (optionalCriterio.isPresent()){
-                    notas.add(optionalCriterio.get());
+            Set<Set<Escala>> notas = new HashSet<>();
+            for (Componente c :optionalAluno.get().getComponentes()) {
+                Optional<Set<Escala>> optionalNotasCadeira = notasRaCadeira(id,c.getOferta().getCadeira().getDesignation(),
+                        c.getOferta().getAno(),c.getType(),1);
+                if (optionalNotasCadeira.isPresent()){
+                    notas.add(optionalNotasCadeira.get());
                 }
             }
             return Optional.of(notas);
@@ -178,40 +183,62 @@ public class AlunoService {
         return Optional.empty();
     }
 
-    public Optional<Escala> notasCadeira(String id, String cadeira, int ano, String componente){
+    public Optional<Set<Escala>> notasCadeira(String id, String cadeira, int ano, String componente, int mode){
         Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
         Optional<Componente> optionalComponente = componenteService.findByType(cadeira,ano,componente);
         if (optionalAluno.isPresent() && optionalComponente.isPresent() && optionalComponente.get().getAlunos().contains(optionalAluno.get())){
             Set<Escala> notas = new HashSet<>();
-            for (Aluno a : optionalComponente.get().getAlunos()) {
-                if (a.getId() == optionalAluno.get().getId()){
-                    for (MomentoRealizado mr : a.getMomentos()) {
-                        if (mr.getMomento().getComponente().getId() == optionalComponente.get().getId()){
-                            Escala cr = new Escala(mr.getMomento().getComponente().getOferta().getCadeira().getDesignation() + " - " + mr.getMomento().getDesignation(), 0.0f);
-                            cr.setNota(mr.nota());
-                            return Optional.of(cr);
-                        }
+            for (MomentoRealizado mr : optionalAluno.get().getMomentos()) {
+                if (mr.getMomento().getComponente().getId() == optionalComponente.get().getId()){
+                    Escala e;
+                    if (mode == 0){
+                        e = new Escala(mr.getMomento().getDesignation(), 0.0f);
                     }
+                    else {
+                        e = new Escala(cadeira + " - " + mr.getMomento().getDesignation(), 0.0f);
+                    }
+                    e.setNota(mr.nota());
+                    notas.add(e);
                 }
             }
+            return Optional.of(notas);
         }
         return Optional.empty();
     }
 
-    public Optional<Set<Escala>> notas(String id){
+    public Optional<Set<Set<Escala>>> notas(String id){
         Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
         if (optionalAluno.isPresent()){
-            Set<Escala> notas = new HashSet<>();
+            Set<Set<Escala>> notas = new HashSet<>();
             for (Componente c : optionalAluno.get().getComponentes()) {
-                Optional<Escala> optionalCriterio = notasCadeira(id,
+                Optional<Set<Escala>> optionalNotasCadeira = notasCadeira(id,
                         c.getOferta().getCadeira().getDesignation(),
                         c.getOferta().getAno(),
-                        c.getType());
-                if (optionalCriterio.isPresent()){
-                    notas.add(optionalCriterio.get());
+                        c.getType(), 1);
+                if (optionalNotasCadeira.isPresent()){
+                    notas.add(optionalNotasCadeira.get());
                 }
             }
             return Optional.of(notas);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Set<Escala>> notasFinais(String id){
+        Optional<Aluno> optionalAluno = alunoRepo.findByCode(id);
+        if (optionalAluno.isPresent()){
+            Set<Escala> notasFinais = new HashSet<>();
+            for (Componente c : optionalAluno.get().getComponentes()) {
+                float nota = 0.0f;
+                for (MomentoRealizado mr : optionalAluno.get().getMomentos()) {
+                    if (mr.getMomento().getComponente().getId().equals(c.getId())){
+                        nota += (mr.nota()*mr.getMomento().getPesoAvaliacao());
+                    }
+                }
+                notasFinais.add(new Escala(c.getOferta().getCadeira().getDesignation() + " " + c.getType(),
+                        nota));
+            }
+            return Optional.of(notasFinais);
         }
         return Optional.empty();
     }

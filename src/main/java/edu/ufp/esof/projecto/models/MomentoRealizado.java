@@ -51,18 +51,22 @@ public class MomentoRealizado {
         this.momento = momento;
     }
 
-    public float notaRa(){
+    public float notaRa(ResultadoAprendizagem ra){
         float nota = 0.0f;
         for (QuestaoRespondida qr : questoes) {
-            nota += qr.getQuestao().getPesoRA()*qr.getEscala().getNota();
+            if (qr.getEscala()!= null && ra.getDesignation().equals(qr.getQuestao().getRa().getDesignation())){
+                nota += qr.getQuestao().getPesoRA()*qr.getEscala().getNota();
+            }
         }
         return nota;
     }
-
+    
     public float nota(){
         float nota = 0.0f;
         for (QuestaoRespondida qr : questoes) {
-            nota += qr.getQuestao().getPesoMomento()*qr.getEscala().getNota();
+            if (qr.getEscala()!= null){
+                nota += qr.getQuestao().getPesoMomento()*qr.getEscala().getNota();
+            }
         }
         return nota;
     }

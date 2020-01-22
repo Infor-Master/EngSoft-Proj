@@ -3,6 +3,7 @@ package edu.ufp.esof.projecto.controllers;
 import edu.ufp.esof.projecto.models.Aluno;
 import edu.ufp.esof.projecto.models.Componente;
 import edu.ufp.esof.projecto.models.Escala;
+import edu.ufp.esof.projecto.models.NotaRequest;
 import edu.ufp.esof.projecto.services.AlunoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,48 +145,60 @@ public class AlunoController {
 
 
 
-    @RequestMapping(value = "/{id}/notasRA/{cadeira}/{ano}/{componente}",method = RequestMethod.GET)
-    public ResponseEntity<Escala> getNotasRaOfComponenteFromAluno(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("componente") String componente) throws NoAlunoExcpetion {
-        this.logger.info("Listing Request for notasRA from aluno with id " + id + " for componente " + componente);
+    @RequestMapping(value = "/notasRA/{cadeira}",method = RequestMethod.GET)
+    public ResponseEntity<Set<Escala>> getNotasRaOfComponenteFromAluno(@RequestBody NotaRequest nr, @PathVariable("cadeira") String cadeira) throws NoAlunoExcpetion {
+        this.logger.info("Listing Request for notasRA");
 
-        Optional<Escala> optionalCriterio =this.alunoService.notasRaCadeira(id,cadeira,ano,componente);
-        if(optionalCriterio.isPresent()) {
-            return ResponseEntity.ok(optionalCriterio.get());
+        Optional<Set<Escala>> optionalNotas =this.alunoService.notasRaCadeira(nr.getAlunoNumero(),cadeira,nr.getAno(),nr.getComponente(),0);
+        if(optionalNotas.isPresent()) {
+            return ResponseEntity.ok(optionalNotas.get());
         }
-        throw new NoAlunoExcpetion(id);
+        throw new NoAlunoExcpetion(nr.getAlunoNumero());
     }
 
-    @RequestMapping(value = "/{id}/notasRA",method = RequestMethod.GET)
-    public ResponseEntity<Set<Escala>> getNotasRaFromAluno(@PathVariable("id") String id) throws NoAlunoExcpetion {
-        this.logger.info("Listing Request for notasRA from aluno with id " + id);
+    @RequestMapping(value = "/notasRA",method = RequestMethod.GET)
+    public ResponseEntity<Set<Set<Escala>>> getNotasRaFromAluno(@RequestBody NotaRequest nr) throws NoAlunoExcpetion {
+        this.logger.info("Listing Request for notasRA");
 
-        Optional<Set<Escala>> optionalCriterios =this.alunoService.notasRa(id);
-        if(optionalCriterios.isPresent()) {
-            return ResponseEntity.ok(optionalCriterios.get());
+        Optional<Set<Set<Escala>>> optionalNotas =this.alunoService.notasRa(nr.getAlunoNumero());
+        if(optionalNotas.isPresent()) {
+            return ResponseEntity.ok(optionalNotas.get());
         }
-        throw new NoAlunoExcpetion(id);
+        throw new NoAlunoExcpetion(nr.getAlunoNumero());
     }
 
-    @RequestMapping(value = "/{id}/notas/{cadeira}/{ano}/{componente}",method = RequestMethod.GET)
-    public ResponseEntity<Escala> getNotasOfComponenteFromAluno(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("componente") String componente) throws NoAlunoExcpetion {
-        this.logger.info("Listing Request for notas from aluno with id " + id + " for componente " + componente);
+    @RequestMapping(value = "notas/{cadeira}",method = RequestMethod.GET)
+    public ResponseEntity<Set<Escala>> getNotasOfComponenteFromAluno(@RequestBody NotaRequest nr, @PathVariable("cadeira") String cadeira) throws NoAlunoExcpetion {
+        this.logger.info("Listing Request for notas");
 
-        Optional<Escala> optionalCriterio =this.alunoService.notasCadeira(id,cadeira,ano,componente);
-        if(optionalCriterio.isPresent()) {
-            return ResponseEntity.ok(optionalCriterio.get());
+        Optional<Set<Escala>> optionalNotas =this.alunoService.notasCadeira(nr.getAlunoNumero(),cadeira,nr.getAno(),nr.getComponente(),0);
+        if(optionalNotas.isPresent()) {
+            return ResponseEntity.ok(optionalNotas.get());
         }
-        throw new NoAlunoExcpetion(id);
+        throw new NoAlunoExcpetion(nr.getAlunoNumero());
     }
 
-    @RequestMapping(value = "/{id}/notas",method = RequestMethod.GET)
-    public ResponseEntity<Set<Escala>> getNotasFromAluno(@PathVariable("id") String id) throws NoAlunoExcpetion {
-        this.logger.info("Listing Request for notas from aluno with id " + id);
+    @RequestMapping(value = "/notas",method = RequestMethod.GET)
+    public ResponseEntity<Set<Set<Escala>>> getNotasFromAluno(@RequestBody NotaRequest nr) throws NoAlunoExcpetion {
+        this.logger.info("Listing Request for notas");
 
-        Optional<Set<Escala>> optionalCriterios =this.alunoService.notas(id);
-        if(optionalCriterios.isPresent()) {
-            return ResponseEntity.ok(optionalCriterios.get());
+        Optional<Set<Set<Escala>>> optionalNotas =this.alunoService.notas(nr.getAlunoNumero());
+        if(optionalNotas.isPresent()) {
+            return ResponseEntity.ok(optionalNotas.get());
         }
-        throw new NoAlunoExcpetion(id);
+        throw new NoAlunoExcpetion(nr.getAlunoNumero());
+    }
+
+    // FAzer a seguir
+    @RequestMapping(value = "/notasFinais",method = RequestMethod.GET)
+    public ResponseEntity<Set<Escala>> getNotasFinaisFromAluno(@RequestBody NotaRequest nr) throws NoAlunoExcpetion {
+        this.logger.info("Listing Request for notas");
+
+        Optional<Set<Escala>> optionalNotas =this.alunoService.notasFinais(nr.getAlunoNumero());
+        if(optionalNotas.isPresent()) {
+            return ResponseEntity.ok(optionalNotas.get());
+        }
+        throw new NoAlunoExcpetion(nr.getAlunoNumero());
     }
 
 
@@ -213,8 +226,4 @@ public class AlunoController {
             super("Aluno com nome: " + name + " já existe");
         }
     }
-
-    // Falta filtros por cadeira e por cadeira e numero de aluno
-    // falta PUT e DELETE
-
 }

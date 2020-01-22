@@ -28,10 +28,12 @@ public class DocenteController {
     private EscalaService escalaService;
     private ResultadoAprendizagemService raService;
     private ComponenteService componenteService;
+    private QuestaoRespondidaService questaoRespondidaService;
 
     @Autowired
-    public DocenteController(DocenteService docenteService, MomentoService momentoService, QuestaoService questaoService, EscalaService escalaService, ResultadoAprendizagemService raService, ComponenteService componenteService) {
+    public DocenteController(DocenteService docenteService, QuestaoRespondidaService questaoRespondidaService, MomentoService momentoService, QuestaoService questaoService, EscalaService escalaService, ResultadoAprendizagemService raService, ComponenteService componenteService) {
         this.docenteService = docenteService;
+        this.questaoRespondidaService = questaoRespondidaService;
         this.momentoService = momentoService;
         this.questaoService = questaoService;
         this.escalaService = escalaService;
@@ -183,7 +185,7 @@ public class DocenteController {
     }
 
     //-------------------------------------------//
-    //              RA RELATED                   //
+    //                RA RELATED                 //
     //-------------------------------------------//
 
 
@@ -221,6 +223,9 @@ public class DocenteController {
         }
         throw new NoResultadoAprendizagemException(resultadoAprendizagemRequest.getResultadoAprendizagem().getDesignation());
     }
+
+
+
 
     //-------------------------------------------//
     //              ESCALA RELATED              //
@@ -264,6 +269,7 @@ public class DocenteController {
 
 
 
+
     //-------------------------------------------//
     //              QUESTAO RELATED              //
     //-------------------------------------------//
@@ -284,8 +290,6 @@ public class DocenteController {
         throw new QuestaoAlreadyExistsException(questaoRequest.getQuestao().getDesignation());
     }
 
-    // Falta verificação se professor dá a cadeira
-    // /{id}/{cadeira}/{ano}/{comp]/{momento}/{nome}
     @RequestMapping(value = "/questao", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteQuestao(@RequestBody QuestaoRequest questaoRequest) throws NoMomentoException {
         this.logger.info("Delete Request for questao");
@@ -302,9 +306,15 @@ public class DocenteController {
         throw new NoQuestaoException(questaoRequest.getQuestaoNome());
     }
 
+
+
+
     //-------------------------------------------//
     //              COMPONENTE RELATED           //
     //-------------------------------------------//
+
+
+
 
     @RequestMapping(value = "/alunoscomp", method = RequestMethod.GET)
     public ResponseEntity<Iterable<Aluno>> listaAlunosComponente(@RequestBody ComponenteRequest componenteRequest){
@@ -319,6 +329,30 @@ public class DocenteController {
 
         return  ResponseEntity.ok(this.componenteService.listAlunos(ofertaRequest));
     }
+
+
+
+
+    //-------------------------------------------//
+    //                NOTAS RELATED              //
+    //-------------------------------------------//
+
+
+
+
+    @RequestMapping(value = "/nota", method = RequestMethod.PUT)
+    public ResponseEntity<QuestaoRespondida> atribuirNota(@RequestBody NotaRequest notaRequest){
+        this.logger.info("Request atribuicao de nota");
+
+        Optional<QuestaoRespondida> optionalQuestaoRespondida =this.questaoRespondidaService.atribuirNota(notaRequest);
+        if(optionalQuestaoRespondida.isPresent()) {
+            return ResponseEntity.ok(optionalQuestaoRespondida.get());
+        }
+        throw new NoDocenteException(notaRequest.getDocenteNumero());
+    }
+
+
+
 
     //-------------------------------------------//
     //                 EXCEPTIONS                //

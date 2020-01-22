@@ -383,6 +383,17 @@ public class DocenteController {
         throw new NoDocenteException(notaRequest.getDocenteNumero());
     }
 
+    @RequestMapping(value = "/notaMomento", method = RequestMethod.GET)
+    public ResponseEntity<Set<Escala>> notaMomentoComponente(@RequestBody NotaRequest notaRequest){
+        this.logger.info("Reqúest notas de um momento de uma componente");
+
+        Optional<Set<Escala>> optionalNotas =this.docenteService.notasMomento(notaRequest);
+        if(optionalNotas.isPresent()) {
+            return ResponseEntity.ok(optionalNotas.get());
+        }
+        throw new NoDocenteException(notaRequest.getDocenteNumero());
+    }
+
 
 
 

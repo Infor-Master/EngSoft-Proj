@@ -175,4 +175,37 @@ public class DocenteService {
         }
         return Optional.empty();
     }
+
+    public Optional<Set<Escala>> notasMomento(NotaRequest nr){
+        if (nr.getDocenteNumero()==null || nr.getComponente()==null || nr.getCadeiraNome() == null){
+            return Optional.empty();
+        }
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(nr.getDocenteNumero());
+        Optional<Componente> optionalComponente = componenteService.findByType(nr.getCadeiraNome(), nr.getAno(), nr.getComponente());
+        if (optionalDocente.isPresent() && optionalComponente.isPresent() && optionalDocente.get().getComponentes().contains(optionalComponente.get())){
+            Set<Escala> notas = new HashSet<>();
+            for (Momento m : optionalComponente.get().getMomentos()) {
+                for (Aluno a : optionalComponente.get().getAlunos()) {
+                    for (MomentoRealizado mr : a.getMomentos()) {
+                        if (mr.getMomento().getId().equals(m.getId())){
+                            Optional<Set<Escala>> auxOptional = alunoService.notasCadeira(a.getCode(), nr.getCadeiraNome(),nr.getAno(), nr.getComponente(),0);
+                            if (auxOptional.isPresent()){
+                                for (Escala eAux : auxOptional.get()) {
+                                    if (eAux.getDesignation().equals(m.getDesignation())){
+                                        Escala e = new Escala(a.getName() + " - " + m.getDesignation(), eAux.getNota());
+                                        notas.add(e);
+                                        break;
+                                    }
+                                }
+
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return Optional.of(notas);
+        }
+        return Optional.empty();
+    }
 }

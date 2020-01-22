@@ -95,7 +95,8 @@ public class MomentoService {
                 auxMrSet.add(mr);
             }
             while(!auxMrSet.isEmpty()){
-                Iterator<MomentoRealizado> momentosRealizados = optionalMomentoRealizado.get().iterator();
+                //Iterator<MomentoRealizado> momentosRealizados = optionalMomentoRealizado.get().iterator();
+                Iterator<MomentoRealizado> momentosRealizados = auxMrSet.iterator();
                 MomentoRealizado mr = momentosRealizados.next();
                 auxMrSet.remove(mr);
                 momentoRealizadoService.delete(mr);

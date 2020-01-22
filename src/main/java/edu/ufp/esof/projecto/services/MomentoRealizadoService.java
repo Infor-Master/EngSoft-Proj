@@ -5,6 +5,7 @@ import edu.ufp.esof.projecto.models.Momento;
 import edu.ufp.esof.projecto.models.MomentoRealizado;
 import edu.ufp.esof.projecto.models.QuestaoRespondida;
 import edu.ufp.esof.projecto.repositories.MomentoRealizadoRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -17,6 +18,12 @@ public class MomentoRealizadoService {
 
     private MomentoRealizadoRepo momentoRealizadoRepo;
     private QuestaoRespondidaService questaoRespondidaService;
+
+    @Autowired
+    public MomentoRealizadoService(MomentoRealizadoRepo momentoRealizadoRepo, QuestaoRespondidaService questaoRespondidaService) {
+        this.momentoRealizadoRepo = momentoRealizadoRepo;
+        this.questaoRespondidaService = questaoRespondidaService;
+    }
 
     public Set<MomentoRealizado> findAll(){
         Set<MomentoRealizado> MRs=new HashSet<>();

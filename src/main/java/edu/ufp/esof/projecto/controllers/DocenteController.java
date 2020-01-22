@@ -267,12 +267,10 @@ public class DocenteController {
 
 
 
-    // Falta verificar se professor da a cadeira
     @PostMapping(value = "/questao", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Questao> createQuest(@RequestBody QuestaoRequest questaoRequest){
         this.logger.info("Create Questao Request");
 
-        //Optional<Questao> questaoOptional = this.questaoService.createQuestao(id,cadeira,ano,comp,momento,questao);
         Optional<Questao> questaoOptional = this.questaoService.createQuestao(questaoRequest.getDocenteNumero(),
                 questaoRequest.getCadeiraNome(), questaoRequest.getAno(), questaoRequest.getComp(), questaoRequest.getMomentoNome(),
                 questaoRequest.getQuestao(), questaoRequest.getRaNome());
@@ -283,15 +281,21 @@ public class DocenteController {
     }
 
     // Falta verificação se professor dá a cadeira
-    @RequestMapping(value = "/{id}/{cadeira}/{ano}/{comp]/{momento}/{nome}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteQuestao(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @PathVariable("momento") String momento, @PathVariable("nome") String nome) throws NoMomentoException {
+    // /{id}/{cadeira}/{ano}/{comp]/{momento}/{nome}
+    @RequestMapping(value = "/questao", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteQuestao(@RequestBody QuestaoRequest questaoRequest) throws NoMomentoException {
         this.logger.info("Delete Request for questao");
 
-        Boolean deleted = this.questaoService.deleteQuestao(id,cadeira,ano,comp,momento,nome);
+        Boolean deleted = this.questaoService.deleteQuestao(questaoRequest.getDocenteNumero(),
+                questaoRequest.getCadeiraNome(),
+                questaoRequest.getAno(),
+                questaoRequest.getComp(),
+                questaoRequest.getMomentoNome(),
+                questaoRequest.getQuestaoNome());
         if(deleted) {
-            return ResponseEntity.ok("Deleted momento " + nome);
+            return ResponseEntity.ok("Deleted momento " + questaoRequest.getQuestaoNome());
         }
-        throw new NoQuestaoException(nome);
+        throw new NoQuestaoException(questaoRequest.getQuestaoNome());
     }
 
 

@@ -42,6 +42,9 @@ public class MomentoRealizadoService {
             mr.getAluno().getMomentos().remove(mr);
             mr.setAluno(null);
         }
+        if (mr.getMomento() != null){
+            mr.setMomento(null);            //verificar
+        }
         while(!mr.getQuestoes().isEmpty()){
             Iterator<QuestaoRespondida> questoes = mr.getQuestoes().iterator();
             QuestaoRespondida qr = questoes.next();

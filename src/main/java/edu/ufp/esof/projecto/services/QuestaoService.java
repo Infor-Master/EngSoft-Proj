@@ -14,17 +14,19 @@ public class QuestaoService {
     private QuestaoRespondidaRepo questaoRespondidaRepo;
     private DocenteRepo docenteRepo;
     private CadeiraRepo cadeiraRepo;
+    private MomentoRepo momentoRepo;
     private ResultadoAprendizagemRepo raRepo;
     private QuestaoRespondidaService questaoRespondidaService;
 
     @Autowired
-    public QuestaoService(DocenteRepo docenteRepo, ResultadoAprendizagemRepo raRepo, CadeiraRepo cadeiraRepo, QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, QuestaoRespondidaService questaoRespondidaService) {
+    public QuestaoService(DocenteRepo docenteRepo, MomentoRepo momentoRepo, ResultadoAprendizagemRepo raRepo, CadeiraRepo cadeiraRepo, QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, QuestaoRespondidaService questaoRespondidaService) {
         this.questaoRepo = questaoRepo;
         this.questaoRespondidaRepo = questaoRespondidaRepo;
         this.questaoRespondidaService = questaoRespondidaService;
         this.docenteRepo = docenteRepo;
         this.cadeiraRepo = cadeiraRepo;
         this.raRepo = raRepo;
+        this.momentoRepo = momentoRepo;
     }
 
     public Set<Questao> findAll(){
@@ -88,10 +90,16 @@ public class QuestaoService {
         }
         Optional<Iterable<QuestaoRespondida>> optionalQuestaoRespondidas = questaoRespondidaRepo.findAllByQuestao(q);
         if (optionalQuestaoRespondidas.isPresent()){
-            while(!optionalQuestaoRespondidas.isEmpty()){
-                Iterator<QuestaoRespondida> questoesRespondidas = optionalQuestaoRespondidas.get().iterator();
+            Set<QuestaoRespondida> auxQrSet = new HashSet<>();
+            for (QuestaoRespondida qr : optionalQuestaoRespondidas.get()) {
+                auxQrSet.add(qr);
+            }
+            while (!auxQrSet.isEmpty()){
+                Iterator<QuestaoRespondida> questoesRespondidas = auxQrSet.iterator();
                 QuestaoRespondida qr = questoesRespondidas.next();
+                auxQrSet.remove(qr);
                 questaoRespondidaService.delete(qr);
+
             }
         }
         questaoRepo.delete(q);
@@ -122,6 +130,8 @@ public class QuestaoService {
             if (pesoRA>=1 || questao.getPesoRA()>(1-pesoRA)){
                 return Optional.empty();
             }
+            questao.setRa(ra);
+            ra.getQuestoes().add(questao);
             if (optionalDocente.get().getComponentes().contains(c)) {
                 for (Momento m : c.getMomentos()) {
                     if (m.getDesignation().compareTo(momento) == 0){
@@ -137,6 +147,7 @@ public class QuestaoService {
                         }
                         questao.setMomento(m);
                         m.getQuestoes().add(questao);
+                        //momentoRepo.save(questao.getMomento());
                         questaoRepo.save(questao);
                         questaoRespondidaService.create(questao);
                         return Optional.of(questao);

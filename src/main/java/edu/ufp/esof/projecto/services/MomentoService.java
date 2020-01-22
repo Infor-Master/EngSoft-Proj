@@ -90,9 +90,14 @@ public class MomentoService {
         }
         Optional<Iterable<MomentoRealizado>> optionalMomentoRealizado =momentoRealizadoRepo.findAllByMomento(m);
         if (optionalMomentoRealizado.isPresent()){
-            while(!optionalMomentoRealizado.isEmpty()){
+            Set<MomentoRealizado> auxMrSet = new HashSet<>();
+            for (MomentoRealizado mr : optionalMomentoRealizado.get()) {
+                auxMrSet.add(mr);
+            }
+            while(!auxMrSet.isEmpty()){
                 Iterator<MomentoRealizado> momentosRealizados = optionalMomentoRealizado.get().iterator();
                 MomentoRealizado mr = momentosRealizados.next();
+                auxMrSet.remove(mr);
                 momentoRealizadoService.delete(mr);
             }
         }

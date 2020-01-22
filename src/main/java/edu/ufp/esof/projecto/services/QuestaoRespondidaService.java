@@ -2,6 +2,7 @@ package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.models.builders.QuestaoRespondidaBuilder;
+import edu.ufp.esof.projecto.repositories.MomentoRealizadoRepo;
 import edu.ufp.esof.projecto.repositories.QuestaoRespondidaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,14 @@ import java.util.Set;
 public class QuestaoRespondidaService {
 
     private QuestaoRespondidaRepo questaoRespondidaRepo;
+    private MomentoRealizadoRepo momentoRealizadoRepo;
     private EscalaService escalaService;
     // Falta o Filtro do serviço e no constructor
 
     @Autowired
-    public QuestaoRespondidaService(QuestaoRespondidaRepo questaoRespondidaRepo, EscalaService escalaService) {
+    public QuestaoRespondidaService(QuestaoRespondidaRepo questaoRespondidaRepo, MomentoRealizadoRepo momentoRealizadoRepo, EscalaService escalaService) {
         this.questaoRespondidaRepo = questaoRespondidaRepo;
+        this.momentoRealizadoRepo = momentoRealizadoRepo;
         this.escalaService = escalaService;
     }
 
@@ -66,7 +69,6 @@ public class QuestaoRespondidaService {
             qr.setMomento(null);
         }
         if (qr.getEscala() != null){
-            escalaService.delete(qr.getEscala());
             qr.setEscala(null);
         }
         questaoRespondidaRepo.delete(qr);
@@ -77,9 +79,9 @@ public class QuestaoRespondidaService {
             for (MomentoRealizado mr : a.getMomentos()) {
                 if (mr.getMomento().getId() == q.getMomento().getId()){
                     QuestaoRespondida qr = new QuestaoRespondidaBuilder().setQuestao(q)
-                            .setEscala(new Escala("nota", 0.0f))
                             .setMomento(mr).build();
                     questaoRespondidaRepo.save(qr);
+                    momentoRealizadoRepo.save(mr);
                     break;
                 }
             }

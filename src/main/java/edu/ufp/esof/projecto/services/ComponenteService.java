@@ -7,6 +7,7 @@ import edu.ufp.esof.projecto.repositories.OfertaRepo;
 import edu.ufp.esof.projecto.services.filters.Componente.FilterComponenteObject;
 import edu.ufp.esof.projecto.services.filters.Componente.FilterComponenteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -183,5 +184,40 @@ public class ComponenteService {
             c.setOferta(null);
         }
         componenteRepo.delete(c);
+    }
+
+    public Set<Aluno> listAlunos(ComponenteRequest componenteRequest) {
+        Set<Aluno> alunos = new HashSet<>();
+        Optional<Cadeira> cadeira=this.cadeiraRepo.findByDesignation(componenteRequest.getCadeiraNome());
+        if(cadeira.isPresent()){
+            for (Oferta o:cadeira.get().getOfertas()) {
+                if (o.getAno().equals(componenteRequest.getAno())){
+                    for (Componente c:o.getComponentes()) {
+                        if (c.getType().equals(componenteRequest.getType())){
+                            alunos.addAll(c.getAlunos());
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        return alunos;
+    }
+
+    public Set<Aluno> listAlunos(OfertaRequest ofertaRequest) {
+        Set<Aluno> alunos = new HashSet<>();
+        Optional<Cadeira> cadeira=this.cadeiraRepo.findByDesignation(ofertaRequest.getCadeiraNome());
+        if(cadeira.isPresent()){
+            for (Oferta o:cadeira.get().getOfertas()) {
+                if (o.getAno().equals(ofertaRequest.getAno())){
+                    for (Componente c:o.getComponentes()) {
+                        alunos.addAll(c.getAlunos());
+                    }
+                    break;
+                }
+            }
+        }
+        return alunos;
     }
 }

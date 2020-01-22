@@ -11,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/docente")
@@ -25,14 +27,16 @@ public class DocenteController {
     private QuestaoService questaoService;
     private EscalaService escalaService;
     private ResultadoAprendizagemService raService;
+    private ComponenteService componenteService;
 
     @Autowired
-    public DocenteController(DocenteService docenteService, MomentoService momentoService, QuestaoService questaoService, EscalaService escalaService, ResultadoAprendizagemService raService) {
+    public DocenteController(DocenteService docenteService, MomentoService momentoService, QuestaoService questaoService, EscalaService escalaService, ResultadoAprendizagemService raService, ComponenteService componenteService) {
         this.docenteService = docenteService;
         this.momentoService = momentoService;
         this.questaoService = questaoService;
         this.escalaService = escalaService;
         this.raService = raService;
+        this.componenteService = componenteService;
     }
 
 
@@ -298,8 +302,23 @@ public class DocenteController {
         throw new NoQuestaoException(questaoRequest.getQuestaoNome());
     }
 
+    //-------------------------------------------//
+    //              COMPONENTE RELATED           //
+    //-------------------------------------------//
 
+    @RequestMapping(value = "/alunoscomp", method = RequestMethod.GET)
+    public ResponseEntity<Iterable<Aluno>> listaAlunosComponente(@RequestBody ComponenteRequest componenteRequest){
+        this.logger.info("List Alunos of Componente");
 
+        return  ResponseEntity.ok(this.componenteService.listAlunos(componenteRequest));
+    }
+
+    @RequestMapping(value = "/alunosoferta", method = RequestMethod.GET)
+    public ResponseEntity<Iterable<Aluno>> listaAlunosOferta(@RequestBody OfertaRequest ofertaRequest){
+        this.logger.info("List Alunos of Oferta");
+
+        return  ResponseEntity.ok(this.componenteService.listAlunos(ofertaRequest));
+    }
 
     //-------------------------------------------//
     //                 EXCEPTIONS                //

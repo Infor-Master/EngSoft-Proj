@@ -20,16 +20,14 @@ public class ComponenteService {
     private OfertaRepo ofertaRepo;
     private MomentoService momentoService;
     private FilterComponenteService filterService;
-    private AlunoService alunoService;
 
     @Autowired
-    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, OfertaRepo ofertaRepo, MomentoService momentoService, FilterComponenteService filterService, AlunoService alunoService) {
+    public ComponenteService(ComponenteRepo componenteRepo, CadeiraRepo cadeiraRepo, OfertaRepo ofertaRepo, MomentoService momentoService, FilterComponenteService filterService) {
         this.componenteRepo = componenteRepo;
         this.cadeiraRepo = cadeiraRepo;
         this.momentoService = momentoService;
         this.filterService = filterService;
         this.ofertaRepo = ofertaRepo;
-        this.alunoService = alunoService;
     }
 
     public Set<Componente> filterComponente(Map<String, String> searchParams){
@@ -222,5 +220,4 @@ public class ComponenteService {
         }
         return alunos;
     }
-
 }

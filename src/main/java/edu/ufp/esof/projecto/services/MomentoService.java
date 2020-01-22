@@ -164,7 +164,7 @@ public class MomentoService {
                 for (Momento m : componente.getMomentos()) {
                     if (m.getDesignation().equals(momentoRequest.getMomentoNome())){
                         if (upMomento.getDesignation()!=null){
-                            Boolean checkName = true;
+                            boolean checkName = true;
                             for (Momento aux : componente.getMomentos()) {
                                 if (aux.getDesignation().equals(upMomento.getDesignation())){
                                     checkName = false;

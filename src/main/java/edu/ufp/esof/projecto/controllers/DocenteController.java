@@ -306,6 +306,16 @@ public class DocenteController {
         throw new NoQuestaoException(questaoRequest.getQuestaoNome());
     }
 
+    @RequestMapping(value = "/questao", method = RequestMethod.PUT)
+    public ResponseEntity<Questao> updateQuestao(@RequestBody QuestaoRequest questaoRequest){
+        this.logger.info("Update Request for questao");
+
+        Optional<Questao> optionalQuestao = this.questaoService.updateQuestao(questaoRequest);
+        if(optionalQuestao.isPresent()){
+            return ResponseEntity.ok(optionalQuestao.get());
+        }
+        throw new NoQuestaoException(questaoRequest.getQuestaoNome());
+    }
 
 
 

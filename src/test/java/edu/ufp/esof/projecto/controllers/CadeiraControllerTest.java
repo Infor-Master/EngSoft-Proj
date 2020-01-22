@@ -328,14 +328,14 @@ class CadeiraControllerTest {
                 status().isNotFound()
         );
     }
-
+/**
     @Test
     void editCriterio() throws Exception {
         Cadeira cadeira=new Cadeira("Teste","123");
         Escala escala =new Escala("bom", 10F);
         Escala escala2 =new Escala("bom", 15F);
 
-        when(this.escalaService.updateCriterio("Teste","bom", escala2)).thenReturn(Optional.of(escala2));
+        when(this.escalaService.updateEscala("Teste","bom", escala2)).thenReturn(Optional.of(escala2));
         String jsonRequest=this.objectMapper.writeValueAsString(escala2);
         this.mockMvc.perform(
                 put("/cadeira/Teste/escalas/bom").contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -351,12 +351,12 @@ class CadeiraControllerTest {
                         .content(jsonRequest)
         ).andExpect(status().isNotFound());
     }
-
+**/
     @Test
     void createCriterio() throws Exception {
         Cadeira cadeira=new Cadeira("Teste","123");
         Escala escala =new Escala("bom", 10F);
-        when(escalaService.createCriterio("Teste", escala)).thenReturn(Optional.of(escala));
+        when(escalaService.createEscala("Teste", escala)).thenReturn(Optional.of(escala));
         String jsonRequest=this.objectMapper.writeValueAsString(escala);
 
         this.mockMvc.perform(
@@ -364,7 +364,7 @@ class CadeiraControllerTest {
         ).andExpect(status().isOk());
 
         Escala BADcriterio=new Escala("bom", 99F);
-        when(escalaService.createCriterio("Teste", BADcriterio)).thenReturn(Optional.empty());
+        when(escalaService.createEscala("Teste", BADcriterio)).thenReturn(Optional.empty());
         String BADjsonRequest=this.objectMapper.writeValueAsString(BADcriterio);
 
         this.mockMvc.perform(

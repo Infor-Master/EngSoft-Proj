@@ -2,6 +2,7 @@ package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.Cadeira;
 import edu.ufp.esof.projecto.models.Escala;
+import edu.ufp.esof.projecto.models.EscalaRequest;
 import edu.ufp.esof.projecto.repositories.CadeiraRepo;
 import edu.ufp.esof.projecto.repositories.EscalaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,28 +46,47 @@ public class EscalaService {
         }
         return Optional.empty();
     }
-
-    public Optional<Escala> createCriterio(String cadeira, Escala escala) {
-        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
-        if (optionalCadeira.isPresent()){
-            for (Escala c : optionalCadeira.get().getEscalas()) {
-                if (c.getDesignation().compareTo(escala.getDesignation())==0){
+    
+    public Optional<Escala> createEscala(String cadeira, Escala escala) {
+        if(escala.getDesignation()==null){
+            return Optional.empty();
+        }
+        Float nota = 0.0f;
+        Optional<Cadeira> optionalCadeira=cadeiraRepo.findByDesignation(cadeira);
+        if(optionalCadeira.isPresent()){
+            Cadeira cadeira1=optionalCadeira.get();
+            for (Escala e: cadeira1.getEscalas()) {
+                if(e.getDesignation().equals(escala.getDesignation())){
                     return Optional.empty();
                 }
             }
-            optionalCadeira.get().getEscalas().add(escala);
-            this.escalaRepo.save(escala);
+            cadeira1.addEscala(escala);
+            escalaRepo.save(escala);
             return Optional.of(escala);
         }
         return Optional.empty();
     }
 
-    public Optional<Escala> updateCriterio(String cadeira, String designation, Escala escala){
-        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
-        if (optionalCadeira.isPresent()){
-            for (Escala c : optionalCadeira.get().getEscalas()) {
-                if (c.getDesignation().compareTo(designation)==0){
-                    return update(optionalCadeira.get(),c, escala);
+    public Optional<Escala> updateEscala(EscalaRequest escalaRequest){
+        if(escalaRequest.getEscala() == null ||
+                escalaRequest.getCadeiraNome() == null ||
+                escalaRequest.getDesignation() == null){
+            return Optional.empty();
+        }
+        Optional<Cadeira> optionalCadeira=cadeiraRepo.findByDesignation(escalaRequest.getCadeiraNome());
+        if(optionalCadeira.isPresent()) {
+            Cadeira cadeira = optionalCadeira.get();
+            Escala upescala = escalaRequest.getEscala();
+            if (upescala.getDesignation() != null) {
+                for (Escala aux : cadeira.getEscalas()) {
+                    if (aux.getDesignation().equals(escalaRequest.getDesignation())) {
+                        aux.setDesignation(upescala.getDesignation());
+                        if(upescala.getNota()!=null && upescala.getNota()!=0.0f){
+                            aux.setNota(upescala.getNota());
+                        }
+                        escalaRepo.save(aux);
+                        return Optional.of(aux);
+                    }
                 }
             }
         }
@@ -75,7 +95,7 @@ public class EscalaService {
 
 
     public Optional<Escala> update(Cadeira c, Escala old, Escala newCr){
-        Boolean check = true;
+        boolean check = true;
         if (newCr.getDesignation() != null && old.getDesignation().compareTo(newCr.getDesignation()) != 0){
             for (Escala cr : c.getEscalas()) {
                 if(cr.getDesignation().compareTo(newCr.getDesignation()) == 0){
@@ -103,13 +123,13 @@ public class EscalaService {
         return Optional.of(old);
     }
 
-    public Boolean deleteCriterio(String cadeira, String designation){
-        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
+    public Boolean deleteEscala(EscalaRequest escalaRequest){
+        Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(escalaRequest.getCadeiraNome());
         if (optionalCadeira.isPresent()){
-            for (Escala c : optionalCadeira.get().getEscalas()) {
-                if (c.getDesignation().compareTo(designation) == 0){
-                    optionalCadeira.get().getEscalas().remove(c);
-                    escalaRepo.delete(c);
+            for (Escala e : optionalCadeira.get().getEscalas()) {
+                if (e.getDesignation().equals(escalaRequest.getEscala().getDesignation())){
+                    optionalCadeira.get().getEscalas().remove(e);
+                    delete(e);
                     return true;
                 }
             }
@@ -121,15 +141,15 @@ public class EscalaService {
         Optional<Cadeira> optionalCadeira = cadeiraRepo.findByDesignation(cadeira);
         if(optionalCadeira.isPresent()){
             while(!optionalCadeira.get().getEscalas().isEmpty()){
-                Iterator<Escala> criterios = optionalCadeira.get().getEscalas().iterator();
-                Escala c=criterios.next();
+                Iterator<Escala> escalas = optionalCadeira.get().getEscalas().iterator();
+                Escala c=escalas.next();
                 optionalCadeira.get().getEscalas().remove(c);
                 escalaRepo.delete(c);
             }
         }
     }
 
-    public void delete(Escala c){
-        escalaRepo.delete(c);
+    public void delete(Escala e){
+        escalaRepo.delete(e);
     }
 }

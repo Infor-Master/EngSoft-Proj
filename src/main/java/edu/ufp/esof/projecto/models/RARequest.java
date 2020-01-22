@@ -5,8 +5,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class EscalaRequest {
+public class RARequest {
     private String cadeiraNome;
-    private Escala escala;
-    private String designation;
+    private int ano;
+    private ResultadoAprendizagem resultadoAprendizagem;
+    private String RANome;
 }

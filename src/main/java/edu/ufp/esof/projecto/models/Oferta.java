@@ -47,4 +47,11 @@ public class Oferta {
         this.cadeira = cadeira;
         cadeira.getOfertas().add(this);
     }
+
+    public void addRA(ResultadoAprendizagem resultadoAprendizagem) {
+        if(!this.getRas().contains(resultadoAprendizagem)){
+            this.getRas().add(resultadoAprendizagem);
+            resultadoAprendizagem.setOferta(this);
+        }
+    }
 }

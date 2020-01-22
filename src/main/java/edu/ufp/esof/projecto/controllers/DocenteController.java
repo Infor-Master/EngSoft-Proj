@@ -1,10 +1,7 @@
 package edu.ufp.esof.projecto.controllers;
 
 import edu.ufp.esof.projecto.models.*;
-import edu.ufp.esof.projecto.services.DocenteService;
-import edu.ufp.esof.projecto.services.EscalaService;
-import edu.ufp.esof.projecto.services.MomentoService;
-import edu.ufp.esof.projecto.services.QuestaoService;
+import edu.ufp.esof.projecto.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +24,15 @@ public class DocenteController {
     private MomentoService momentoService;
     private QuestaoService questaoService;
     private EscalaService escalaService;
+    private ResultadoAprendizagemService raService;
 
     @Autowired
-    public DocenteController(DocenteService docenteService, MomentoService momentoService, QuestaoService questaoService, EscalaService escalaService) {
+    public DocenteController(DocenteService docenteService, MomentoService momentoService, QuestaoService questaoService, EscalaService escalaService, ResultadoAprendizagemService raService) {
         this.docenteService = docenteService;
         this.momentoService = momentoService;
         this.questaoService = questaoService;
         this.escalaService = escalaService;
+        this.raService = raService;
     }
 
 
@@ -180,6 +179,46 @@ public class DocenteController {
     }
 
     //-------------------------------------------//
+    //              RA RELATED                   //
+    //-------------------------------------------//
+
+
+
+
+    @PostMapping(value = "/ra", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResultadoAprendizagem> createResultadoAprendizagem(@RequestBody RARequest resultadoAprendizagemRequest){
+        this.logger.info("Create ResultadoAprendizagem Request");
+
+        Optional<ResultadoAprendizagem> resultadoAprendizagemOptional=this.raService.createResultadoAprendizagem(resultadoAprendizagemRequest.getCadeiraNome(),resultadoAprendizagemRequest.getAno(),resultadoAprendizagemRequest.getResultadoAprendizagem());
+        if(resultadoAprendizagemOptional.isPresent()){
+            return ResponseEntity.ok(resultadoAprendizagemOptional.get());
+        }
+        throw new ResultadoAprendizagemAlreadyExistsException(resultadoAprendizagemRequest.getResultadoAprendizagem().getDesignation());
+    }
+
+    @RequestMapping(value = "/ra", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteResultadoAprendizagem(@RequestBody RARequest resultadoAprendizagemRequest) throws NoResultadoAprendizagemException {
+        this.logger.info("Delete ResultadoAprendizagem Request");
+
+        Boolean deleted = this.raService.deleteResultadoAprendizagem(resultadoAprendizagemRequest);
+        if(deleted) {
+            return ResponseEntity.ok("Deleted resultadoAprendizagem " + resultadoAprendizagemRequest.getResultadoAprendizagem().getDesignation());
+        }
+        throw new DocenteController.NoResultadoAprendizagemException(resultadoAprendizagemRequest.getResultadoAprendizagem().getDesignation());
+    }
+
+    @RequestMapping(value = "/ra", method = RequestMethod.PUT)
+    public ResponseEntity<ResultadoAprendizagem> updateResultadoAprendizagem(@RequestBody RARequest resultadoAprendizagemRequest){
+        this.logger.info("Update Request for resultadoAprendizagem");
+
+        Optional<ResultadoAprendizagem> optionalResultadoAprendizagem =this.raService.updateResultadoAprendizagem(resultadoAprendizagemRequest);
+        if(optionalResultadoAprendizagem.isPresent()) {
+            return ResponseEntity.ok(optionalResultadoAprendizagem.get());
+        }
+        throw new NoResultadoAprendizagemException(resultadoAprendizagemRequest.getResultadoAprendizagem().getDesignation());
+    }
+
+    //-------------------------------------------//
     //              ESCALA RELATED              //
     //-------------------------------------------//
 
@@ -290,6 +329,21 @@ public class DocenteController {
     private static class NoMomentoException extends RuntimeException{
         private NoMomentoException(String nome){
             super("Momento " + nome + " não existente");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="RA já existente")
+    private static class ResultadoAprendizagemAlreadyExistsException extends RuntimeException {
+
+        public ResultadoAprendizagemAlreadyExistsException(String name) {
+            super("RA com nome: " + name + " já existe");
+        }
+    }
+
+    @ResponseStatus(value= HttpStatus.NOT_FOUND, reason = "RA não existente")
+    private static class NoResultadoAprendizagemException extends RuntimeException{
+        private NoResultadoAprendizagemException(String nome){
+            super("RA " + nome + " não existente");
         }
     }
 

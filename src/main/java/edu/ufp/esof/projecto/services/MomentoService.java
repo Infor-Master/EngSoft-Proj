@@ -116,7 +116,7 @@ public class MomentoService {
         Optional<Docente> optionalDocente = docenteRepo.findByCode(id);
         if (optionalComponente.isPresent() && optionalDocente.isPresent()){
             if (optionalDocente.get().getComponentes().contains(optionalComponente.get())){
-                Float peso = 0.0f;
+                float peso = 0.0f;
                 Componente componente=optionalComponente.get();
                 for (Momento m : componente.getMomentos()) {
                     peso = peso + m.getPesoAvaliacao();

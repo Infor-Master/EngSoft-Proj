@@ -361,6 +361,40 @@ public class DocenteController {
         throw new NoDocenteException(notaRequest.getDocenteNumero());
     }
 
+    @RequestMapping(value = "/nota/{cadeira}", method = RequestMethod.GET)
+    public ResponseEntity<Set<Escala>> notasFinaisComponente(@PathVariable("cadeira") String cadeira, @RequestBody NotaRequest notaRequest){
+        this.logger.info("Reqúest notas finais componente");
+
+        Optional<Set<Escala>> optionalNotasFinais =this.docenteService.notasFinaisComponente(cadeira, notaRequest);
+        if(optionalNotasFinais.isPresent()) {
+            return ResponseEntity.ok(optionalNotasFinais.get());
+        }
+        throw new NoDocenteException(notaRequest.getDocenteNumero());
+    }
+
+    @RequestMapping(value = "/nota", method = RequestMethod.GET)
+    public ResponseEntity<Set<Set<Escala>>> notasFinais(@RequestBody NotaRequest notaRequest){
+        this.logger.info("Reqúest notas finais componente");
+
+        Optional<Set<Set<Escala>>> optionalNotasFinais =this.docenteService.notasFinais(notaRequest);
+        if(optionalNotasFinais.isPresent()) {
+            return ResponseEntity.ok(optionalNotasFinais.get());
+        }
+        throw new NoDocenteException(notaRequest.getDocenteNumero());
+    }
+
+    @RequestMapping(value = "/notaMomento", method = RequestMethod.GET)
+    public ResponseEntity<Set<Escala>> notaMomentoComponente(@RequestBody NotaRequest notaRequest){
+        this.logger.info("Reqúest notas de um momento de uma componente");
+
+        Optional<Set<Escala>> optionalNotas =this.docenteService.notasMomento(notaRequest);
+        if(optionalNotas.isPresent()) {
+            return ResponseEntity.ok(optionalNotas.get());
+        }
+        throw new NoDocenteException(notaRequest.getDocenteNumero());
+    }
+
+
 
 
 

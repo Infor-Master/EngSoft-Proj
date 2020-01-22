@@ -1,17 +1,11 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.*;
-import edu.ufp.esof.projecto.repositories.CadeiraRepo;
-import edu.ufp.esof.projecto.repositories.DocenteRepo;
-import edu.ufp.esof.projecto.repositories.QuestaoRespondidaRepo;
-import edu.ufp.esof.projecto.repositories.QuestaoRepo;
+import edu.ufp.esof.projecto.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class QuestaoService {
@@ -20,15 +14,17 @@ public class QuestaoService {
     private QuestaoRespondidaRepo questaoRespondidaRepo;
     private DocenteRepo docenteRepo;
     private CadeiraRepo cadeiraRepo;
+    private ResultadoAprendizagemRepo raRepo;
     private QuestaoRespondidaService questaoRespondidaService;
 
     @Autowired
-    public QuestaoService(DocenteRepo docenteRepo, CadeiraRepo cadeiraRepo, QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, QuestaoRespondidaService questaoRespondidaService) {
+    public QuestaoService(DocenteRepo docenteRepo, ResultadoAprendizagemRepo raRepo, CadeiraRepo cadeiraRepo, QuestaoRepo questaoRepo, QuestaoRespondidaRepo questaoRespondidaRepo, QuestaoRespondidaService questaoRespondidaService) {
         this.questaoRepo = questaoRepo;
         this.questaoRespondidaRepo = questaoRespondidaRepo;
         this.questaoRespondidaService = questaoRespondidaService;
         this.docenteRepo = docenteRepo;
         this.cadeiraRepo = cadeiraRepo;
+        this.raRepo = raRepo;
     }
 
     public Set<Questao> findAll(){
@@ -101,24 +97,43 @@ public class QuestaoService {
         questaoRepo.delete(q);
     }
 
-    public Optional<Questao> createQuestao(String did, String cadeira, int ano, String componente, String momento, Questao questao){
+    public Optional<Questao> createQuestao(String did, String cadeira, int ano, String componente, String momento, Questao questao, String raNome){
         if (questao.getDesignation() == null){
             return Optional.empty();
         }
         Optional<Componente> optionalComponente = findComponentByType(cadeira,ano,componente);
         Optional<Docente> optionalDocente = docenteRepo.findByCode(did);
         if (optionalComponente.isPresent() && optionalDocente.isPresent()) {
-            if (optionalDocente.get().getComponentes().contains(optionalComponente.get())) {
-                for (Momento m : optionalComponente.get().getMomentos()) {
+            Componente c = optionalComponente.get();
+            ResultadoAprendizagem ra = null;
+            for (ResultadoAprendizagem aux : c.getOferta().getRas()) {
+                if (aux.getDesignation().equals(raNome)){
+                    ra = aux;
+                    break;
+                }
+            }
+            if (ra == null){
+                return Optional.empty();
+            }
+            float pesoRA = 0.0f;
+            for(Questao aux : ra.getQuestoes()){
+                pesoRA += aux.getPesoRA();
+            }
+            if (pesoRA>=1 || questao.getPesoRA()>(1-pesoRA)){
+                return Optional.empty();
+            }
+            if (optionalDocente.get().getComponentes().contains(c)) {
+                for (Momento m : c.getMomentos()) {
                     if (m.getDesignation().compareTo(momento) == 0){
-                        float pesoRA = 0.0f;
                         float pesoM = 0.0f;
                         for (Questao q : m.getQuestoes()) {
-                            pesoRA += q.getPesoRA();
                             pesoM += q.getPesoMomento();
-                            if (q.getDesignation().compareTo(questao.getDesignation()) == 0 || pesoM >1 || pesoRA>1){
+                            if (q.getDesignation().equals(questao.getDesignation()) || pesoM >=1){
                                 return Optional.empty();
                             }
+                        }
+                        if (questao.getPesoMomento() > (1-pesoM)){
+                            return Optional.empty();
                         }
                         questao.setMomento(m);
                         m.getQuestoes().add(questao);

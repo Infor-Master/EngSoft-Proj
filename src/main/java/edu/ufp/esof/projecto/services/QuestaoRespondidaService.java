@@ -1,6 +1,7 @@
 package edu.ufp.esof.projecto.services;
 
 import edu.ufp.esof.projecto.models.*;
+import edu.ufp.esof.projecto.models.builders.QuestaoRespondidaBuilder;
 import edu.ufp.esof.projecto.repositories.QuestaoRespondidaRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,11 +74,11 @@ public class QuestaoRespondidaService {
 
     public void create(Questao q){
         for (Aluno a : q.getMomento().getComponente().getAlunos()) {
-            QuestaoRespondida qr = new QuestaoRespondida(q);
-            qr.setEscala(new Escala("nota", 0.0f));
             for (MomentoRealizado mr : a.getMomentos()) {
                 if (mr.getMomento().getId() == q.getMomento().getId()){
-                    mr.getQuestoes().add(qr);
+                    QuestaoRespondida qr = new QuestaoRespondidaBuilder().setQuestao(q)
+                            .setEscala(new Escala("nota", 0.0f))
+                            .setMomento(mr).build();
                     questaoRespondidaRepo.save(qr);
                     break;
                 }

@@ -1,9 +1,6 @@
 package edu.ufp.esof.projecto.controllers;
 
-import edu.ufp.esof.projecto.models.Docente;
-import edu.ufp.esof.projecto.models.Momento;
-import edu.ufp.esof.projecto.models.MomentoRequest;
-import edu.ufp.esof.projecto.models.Questao;
+import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.services.DocenteService;
 import edu.ufp.esof.projecto.services.MomentoService;
 import edu.ufp.esof.projecto.services.QuestaoService;
@@ -189,15 +186,18 @@ public class DocenteController {
 
 
     // Falta verificar se professor da a cadeira
-    @PostMapping(value = "/{id}/{cadeira}/{ano}/{comp]/{momento}", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Questao> createQuest(@PathVariable("id") String id, @PathVariable("cadeira") String cadeira, @PathVariable("ano") int ano, @PathVariable("comp") String comp, @PathVariable("momento") String momento, @RequestBody Questao questao){
+    @PostMapping(value = "/questao", produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Questao> createQuest(@RequestBody QuestaoRequest questaoRequest){
         this.logger.info("Create Questao Request");
 
-        Optional<Questao> questaoOptional = this.questaoService.createQuestao(id,cadeira,ano,comp,momento,questao);
+        //Optional<Questao> questaoOptional = this.questaoService.createQuestao(id,cadeira,ano,comp,momento,questao);
+        Optional<Questao> questaoOptional = this.questaoService.createQuestao(questaoRequest.getDocenteNumero(),
+                questaoRequest.getCadeiraNome(), questaoRequest.getAno(), questaoRequest.getComp(), questaoRequest.getMomentoNome(),
+                questaoRequest.getQuestao(), questaoRequest.getRaNome());
         if(questaoOptional.isPresent()){
             return ResponseEntity.ok(questaoOptional.get());
         }
-        throw new QuestaoAlreadyExistsException(questao.getDesignation());
+        throw new QuestaoAlreadyExistsException(questaoRequest.getQuestao().getDesignation());
     }
 
     // Falta verificação se professor dá a cadeira

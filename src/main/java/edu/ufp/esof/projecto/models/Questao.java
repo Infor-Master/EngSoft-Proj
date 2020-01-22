@@ -52,15 +52,5 @@ public class Questao {
         momento.getQuestoes().add(this);
         this.ra = ra;
         ra.getQuestoes().add(this);
-
-        // ANTES
-        /*for (Aluno a : momento.getComponente().getAlunos()) {
-            for (MomentoRealizado mr : a.getMomentos()){
-                if (mr.getMomento().getId() == momento.getId()){
-                    mr.getQuestoes().add(new QuestaoRespondidaBuilder().setMomento(mr).setQuestao(this).build());
-                    break;
-                }
-            }
-        }*/
     }
 }

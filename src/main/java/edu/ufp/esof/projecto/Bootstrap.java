@@ -152,6 +152,12 @@ public class Bootstrap implements ApplicationListener<ContextRefreshedEvent> {
         Componente componente3 = new Componente("teorica", oferta2);
 
 
+        Escala escala1 = new Escala("A", 20.0f);
+        escalaRepo.save(escala1);
+        Escala escala2 = new Escala("C", 12.0f);
+        escalaRepo.save(escala2);
+        cadeira1.addEscala(escala1);
+        cadeira1.addEscala(escala2);
         cadeiraRepo.save(cadeira1);
 
         /*componente3.getAlunos().add(aluno1);

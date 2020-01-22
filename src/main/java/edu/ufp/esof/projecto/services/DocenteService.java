@@ -1,7 +1,6 @@
 package edu.ufp.esof.projecto.services;
 
-import edu.ufp.esof.projecto.models.Componente;
-import edu.ufp.esof.projecto.models.Docente;
+import edu.ufp.esof.projecto.models.*;
 import edu.ufp.esof.projecto.repositories.ComponenteRepo;
 import edu.ufp.esof.projecto.repositories.DocenteRepo;
 import edu.ufp.esof.projecto.repositories.MomentoRepo;
@@ -20,15 +19,18 @@ public class DocenteService {
     private MomentoRepo momentoRepo;
     private FilterDocenteService filterService;
     private ComponenteService componenteService;
+    private AlunoService alunoService;
     private MomentoRealizadoService momentoRealizadoService;
+
     @Autowired
-    public DocenteService(DocenteRepo docenteRepo, ComponenteRepo componenteRepo, MomentoRepo momentoRepo, FilterDocenteService filterService, ComponenteService componenteService, MomentoRealizadoService momentoRealizadoService) {
+    public DocenteService(DocenteRepo docenteRepo, AlunoService alunoService, ComponenteRepo componenteRepo, MomentoRepo momentoRepo, FilterDocenteService filterService, ComponenteService componenteService, MomentoRealizadoService momentoRealizadoService) {
         this.docenteRepo = docenteRepo;
         this.componenteRepo = componenteRepo;
         this.momentoRepo = momentoRepo;
         this.filterService = filterService;
         this.componenteService = componenteService;
         this.momentoRealizadoService = momentoRealizadoService;
+        this.alunoService = alunoService;
     }
 
 
@@ -136,5 +138,41 @@ public class DocenteService {
         return false;
     }
 
+    public Optional<Set<Escala>> notasFinaisComponente(String cadeira, NotaRequest nr){
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(nr.getDocenteNumero());
+        if (optionalDocente.isPresent()){
+            for (Componente c : optionalDocente.get().getComponentes()) {
+                if (c.getOferta().getCadeira().getDesignation().equals(cadeira)){
+                    Set<Escala> notasfinais = new HashSet<>();
+                    for (Aluno a : c.getAlunos()) {
+                        float nota = 0.0f;
+                        for (MomentoRealizado mr : a.getMomentos()) {
+                            if (mr.getMomento().getComponente().getId().equals(c.getId())){
+                                nota += (mr.nota()*mr.getMomento().getPesoAvaliacao());
+                            }
+                        }
+                        Escala e = new Escala(a.getName() + " - " + c.getOferta().getCadeira().getDesignation(), nota);
+                        notasfinais.add(e);
+                    }
+                    return Optional.of(notasfinais);
+                }
+            }
+        }
+        return Optional.empty();
+    }
 
+    public Optional<Set<Set<Escala>>> notasFinais(NotaRequest nr){
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(nr.getDocenteNumero());
+        if (optionalDocente.isPresent()){
+            Set<Set<Escala>> notas = new HashSet<>();
+            for (Componente c : optionalDocente.get().getComponentes()) {
+                Optional<Set<Escala>> optionalNotas = notasFinaisComponente(c.getOferta().getCadeira().getDesignation(), nr);
+                if (optionalNotas.isPresent()){
+                    notas.add(optionalNotas.get());
+                }
+            }
+            return Optional.of(notas);
+        }
+        return Optional.empty();
+    }
 }

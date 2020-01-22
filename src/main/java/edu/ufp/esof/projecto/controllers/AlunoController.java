@@ -189,7 +189,6 @@ public class AlunoController {
         throw new NoAlunoExcpetion(nr.getAlunoNumero());
     }
 
-    // FAzer a seguir
     @RequestMapping(value = "/notasFinais",method = RequestMethod.GET)
     public ResponseEntity<Set<Escala>> getNotasFinaisFromAluno(@RequestBody NotaRequest nr) throws NoAlunoExcpetion {
         this.logger.info("Listing Request for notas");

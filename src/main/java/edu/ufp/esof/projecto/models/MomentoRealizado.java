@@ -60,7 +60,7 @@ public class MomentoRealizado {
         }
         return nota;
     }
-    
+
     public float nota(){
         float nota = 0.0f;
         for (QuestaoRespondida qr : questoes) {

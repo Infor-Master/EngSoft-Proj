@@ -284,8 +284,6 @@ public class DocenteController {
         throw new QuestaoAlreadyExistsException(questaoRequest.getQuestao().getDesignation());
     }
 
-    // Falta verificação se professor dá a cadeira
-    // /{id}/{cadeira}/{ano}/{comp]/{momento}/{nome}
     @RequestMapping(value = "/questao", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteQuestao(@RequestBody QuestaoRequest questaoRequest) throws NoMomentoException {
         this.logger.info("Delete Request for questao");
@@ -301,6 +299,19 @@ public class DocenteController {
         }
         throw new NoQuestaoException(questaoRequest.getQuestaoNome());
     }
+
+    @RequestMapping(value = "/questao", method = RequestMethod.PUT)
+    public ResponseEntity<Questao> updateQuestao(@RequestBody QuestaoRequest questaoRequest){
+        this.logger.info("Update Request for questao");
+
+        Optional<Questao> optionalQuestao = this.questaoService.updateQuestao(questaoRequest);
+        if(optionalQuestao.isPresent()){
+            return ResponseEntity.ok(optionalQuestao.get());
+        }
+        throw new NoQuestaoException(questaoRequest.getQuestaoNome());
+    }
+
+
 
     //-------------------------------------------//
     //              COMPONENTE RELATED           //

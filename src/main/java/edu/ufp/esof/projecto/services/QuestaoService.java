@@ -175,4 +175,78 @@ public class QuestaoService {
         }
         return optionalComponente;
     }
+
+    public Optional<Questao> updateQuestao(QuestaoRequest questaoRequest) {
+        if(questaoRequest.getQuestao() == null ||
+                questaoRequest.getCadeiraNome() == null ||
+                questaoRequest.getAno() <= 0 ||
+                questaoRequest.getComp() == null ||
+                questaoRequest.getMomentoNome() == null ||
+                questaoRequest.getDocenteNumero() == null){
+            return Optional.empty();
+        }
+        Optional<Docente> optionalDocente = docenteRepo.findByCode(questaoRequest.getDocenteNumero());
+        Optional<Momento> optionalMomento = findMomentoByDesignation(questaoRequest.getCadeiraNome(), questaoRequest.getAno(),questaoRequest.getComp(), questaoRequest.getMomentoNome());
+        if (optionalDocente.isPresent() && optionalMomento.isPresent()){
+            Momento momento=optionalMomento.get();
+            Docente docente=optionalDocente.get();
+            if(docente.getComponentes().contains(momento.getComponente())){
+                Questao upQuestao = questaoRequest.getQuestao();
+                for (Questao q:momento.getQuestoes()) {
+                    if(q.getDesignation().equals(questaoRequest.getQuestaoNome())){
+                        if (upQuestao.getDesignation()!=null){
+                            boolean checkName = true;
+                            for (Questao aux: momento.getQuestoes()) {
+                                if(aux.getDesignation().equals(upQuestao.getDesignation())){
+                                    checkName=false;
+                                    break;
+                                }
+                            }
+                            if (checkName){
+                                q.setDesignation(upQuestao.getDesignation());
+                            }
+                        }
+                        if(upQuestao.getPesoMomento()!=null && upQuestao.getPesoMomento()!=0.0f){
+                            Float peso = 0.0f;
+                            for (Questao aux:momento.getQuestoes()) {
+                                peso+=aux.getPesoMomento();
+                            }
+                            peso-=q.getPesoMomento();
+                            if (upQuestao.getPesoMomento()<=(1-peso)){
+                                q.setPesoMomento(upQuestao.getPesoMomento());
+                            }
+                        }
+
+                        if(upQuestao.getPesoRA()!=null && upQuestao.getPesoRA()!=0.0f){
+                            Float peso = 0.0f;
+                            ResultadoAprendizagem ra = q.getRa();
+                            for (Questao aux:ra.getQuestoes()){
+                                peso+=aux.getPesoRA();
+                            }
+                            peso-=q.getPesoRA();
+                            if(upQuestao.getPesoRA()<=(1-peso)){
+                                q.setPesoRA(upQuestao.getPesoRA());
+                            }
+                        }
+                        questaoRepo.save(q);
+                        return Optional.of(q);
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Momento> findMomentoByDesignation(String cadeira, int ano, String type, String designation) {
+        Optional<Componente> optionalComponente = findComponentByType(cadeira,ano,type);
+        if(optionalComponente.isPresent()){
+            Componente componente=optionalComponente.get();
+            for (Momento m:componente.getMomentos()) {
+                if (m.getDesignation().equals(designation)){
+                    return Optional.of(m);
+                }
+            }
+        }
+        return Optional.empty();
+    }
 }
